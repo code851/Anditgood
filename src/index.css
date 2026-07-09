@@ -1,0 +1,344 @@
+/* ============================================================
+   안디잇굿 — 디자인 시스템
+   따뜻한 갤러리 톤: 아이보리 지면 + 먹빛 텍스트 + 테라코타 강조
+   ============================================================ */
+
+:root {
+  /* 지면 / 표면 */
+  --bg: #f4efe7;
+  --surface: #ffffff;
+  --surface-2: #faf6ef;
+  --surface-sunken: #ece5da;
+
+  /* 텍스트 */
+  --ink: #201b16;
+  --ink-2: #5c5248;
+  --ink-3: #938779;
+
+  /* 강조 */
+  --accent: #c8613b;      /* 테라코타 */
+  --accent-soft: #f0d9cd;
+  --accent-ink: #8a3d1f;
+
+  /* 보조 강조 */
+  --gold: #b58b3c;
+  --sage: #6f7a5a;
+  --plum: #7b5769;
+
+  /* 경계/그림자 */
+  --line: #e3d9cb;
+  --line-strong: #d3c6b3;
+  --shadow-sm: 0 1px 2px rgba(60, 45, 30, 0.06);
+  --shadow-md: 0 6px 20px rgba(60, 45, 30, 0.10);
+  --shadow-lg: 0 18px 44px rgba(60, 45, 30, 0.16);
+
+  /* 반경 */
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-pill: 999px;
+
+  --tab-h: 66px;
+  --maxw: 460px;
+
+  --font: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
+    'Malgun Gothic', 'Segoe UI', system-ui, sans-serif;
+  --serif: 'Georgia', 'Nanum Myeongjo', serif;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #2a2521;
+  font-family: var(--font);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+input,
+textarea {
+  font-family: inherit;
+}
+
+/* 데스크톱: 폰 프레임 */
+#root {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.phone {
+  position: relative;
+  width: 100%;
+  max-width: var(--maxw);
+  min-height: 100vh;
+  background: var(--bg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 500px) {
+  #root {
+    padding: 24px 0;
+    align-items: center;
+  }
+  .phone {
+    min-height: 0;
+    height: min(880px, calc(100vh - 48px));
+    border-radius: 34px;
+    box-shadow: var(--shadow-lg), 0 0 0 10px #16130f, 0 0 0 12px #322c26;
+  }
+}
+
+/* ---------- 스크롤 영역 ---------- */
+.scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.page {
+  padding: 0 20px calc(var(--tab-h) + 28px);
+}
+.page--flush {
+  padding: 0 0 calc(var(--tab-h) + 28px);
+}
+
+/* ---------- 헤더 ---------- */
+.appbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(14px);
+  padding: 18px 20px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.appbar__title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+.appbar__sub {
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-top: 2px;
+}
+
+/* ---------- 하단 탭 ---------- */
+.tabbar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--tab-h);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: saturate(1.4) blur(18px);
+  border-top: 1px solid var(--line);
+  display: flex;
+  z-index: 30;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.tabbar__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--ink-3);
+  font-size: 10.5px;
+  font-weight: 600;
+  transition: color 0.18s;
+}
+.tabbar__item.is-active {
+  color: var(--accent);
+}
+.tabbar__icon {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+}
+.tabbar__item.is-active .tabbar__icon svg {
+  transform: translateY(-1px);
+}
+
+/* ---------- 카드 ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---------- 칩 / 배지 ---------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 13px;
+  border-radius: var(--r-pill);
+  font-size: 12.5px;
+  font-weight: 600;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  color: var(--ink-2);
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.chip.is-active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+.chip--accent {
+  background: var(--accent-soft);
+  border-color: transparent;
+  color: var(--accent-ink);
+}
+
+/* ---------- 버튼 ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 15px 22px;
+  border-radius: var(--r-pill);
+  font-size: 15px;
+  font-weight: 700;
+  background: var(--ink);
+  color: #fff;
+  transition: transform 0.12s, opacity 0.15s, background 0.15s;
+}
+.btn:active {
+  transform: scale(0.975);
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.btn--accent {
+  background: var(--accent);
+}
+.btn--block {
+  width: 100%;
+}
+.btn--ghost {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
+}
+
+/* ---------- 섹션 타이틀 ---------- */
+.sec {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 26px 0 14px;
+}
+.sec__title {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+.sec__more {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+
+/* ---------- 유틸 ---------- */
+.muted {
+  color: var(--ink-3);
+}
+.row {
+  display: flex;
+  align-items: center;
+}
+.stack {
+  display: flex;
+  flex-direction: column;
+}
+.hscroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 2px 20px;
+  margin: 0 -20px;
+}
+.hscroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---------- 애니메이션 ---------- */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.fadeUp {
+  animation: fadeUp 0.4s ease both;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--tab-h) + 20px);
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: var(--r-pill);
+  font-size: 13.5px;
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+  z-index: 60;
+  animation: pop 0.3s ease both;
+  white-space: nowrap;
+}
