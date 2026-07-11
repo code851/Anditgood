@@ -112,6 +112,7 @@ export interface FeedPost {
   likes: number
   saves: number
   sponsored?: boolean
+  media?: 'reel' | 'carousel' // 인스타 탐색 그리드 아이콘용
 }
 
 export const FEED: FeedPost[] = [
@@ -128,6 +129,7 @@ export const FEED: FeedPost[] = [
     tags: ['후기인상주의', '색채'],
     likes: 3120,
     saves: 890,
+    media: 'carousel',
   },
   {
     id: 'f2',
@@ -185,6 +187,7 @@ export const FEED: FeedPost[] = [
     tags: ['앰비언트', '휴식'],
     likes: 1450,
     saves: 1680,
+    media: 'reel',
   },
   {
     id: 'f6',
@@ -199,6 +202,7 @@ export const FEED: FeedPost[] = [
     tags: ['챌린지인증', '드로잉'],
     likes: 540,
     saves: 130,
+    media: 'reel',
   },
 ]
 
