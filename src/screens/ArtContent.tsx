@@ -1,12 +1,18 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useStore } from '../store'
-import { FEED, type ContentCategory, type FeedPost } from '../data/content'
-import { fmt, useToast } from '../components/ui'
+import {
+  FEED,
+  CATEGORY_GRADIENT,
+  type ContentCategory,
+  type FeedPost,
+} from '../data/content'
+import { Sheet, fmt, useToast } from '../components/ui'
 import { IconHeart, IconBookmark, IconChat, IconPlus } from '../components/icons'
 
 const CATS: ContentCategory[] = ['전체', '작품', '상식', '전시·정보', '뉴스', '저자극']
+const POST_CATS = CATS.filter((c) => c !== '전체') as Exclude<ContentCategory, '전체'>[]
+const EMOJIS = ['🎨', '🖼️', '✏️', '🖌️', '📷', '🌻', '🌙', '🪷', '🏛️', '🎭', '📖', '🎧']
 
-// 탐색 그리드 아이콘
 const ReelIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,.4))' }}>
     <path d="M8 5v14l11-7z" />
@@ -20,17 +26,19 @@ const CarouselIcon = () => (
 )
 
 export default function ArtContent() {
-  const { state, toggleLike, toggleSave } = useStore()
+  const { state, toggleLike, toggleSave, addUserPost, deleteUserPost } = useStore()
   const toast = useToast()
   const [cat, setCat] = useState<ContentCategory>('전체')
   const [onlySaved, setOnlySaved] = useState(false)
   const [activeId, setActiveId] = useState<string | null>(null)
+  const [composeOpen, setComposeOpen] = useState(false)
 
-  let posts = FEED
+  const allPosts = [...state.userPosts, ...FEED]
+  let posts = allPosts
   if (cat !== '전체') posts = posts.filter((p) => p.category === cat)
   if (onlySaved) posts = posts.filter((p) => state.savedPosts.includes(p.id))
 
-  const active = activeId ? FEED.find((p) => p.id === activeId) : null
+  const active = activeId ? allPosts.find((p) => p.id === activeId) : null
 
   return (
     <div className="scroll">
@@ -69,28 +77,40 @@ export default function ArtContent() {
                 style={{
                   position: 'relative',
                   aspectRatio: '1',
-                  background: p.gradient,
+                  background: p.image ? `center/cover no-repeat url(${p.image})` : p.gradient,
                   display: 'grid',
                   placeItems: 'center',
                   overflow: 'hidden',
                 }}
               >
-                <span style={{ fontSize: 40, filter: 'drop-shadow(0 4px 10px rgba(0,0,0,.28))' }}>{p.emoji}</span>
-
-                {/* 우상단 미디어 아이콘 */}
-                {(p.media || state.savedPosts.includes(p.id)) && (
-                  <span style={{ position: 'absolute', top: 6, right: 6, display: 'flex', gap: 4 }}>
-                    {state.savedPosts.includes(p.id) && (
-                      <span style={{ color: '#fff', filter: 'drop-shadow(0 1px 2px rgba(0,0,0,.4))' }}>
-                        <IconBookmark fill />
-                      </span>
-                    )}
-                    {p.media === 'reel' && <ReelIcon />}
-                    {p.media === 'carousel' && <CarouselIcon />}
-                  </span>
+                {!p.image && (
+                  <span style={{ fontSize: 40, filter: 'drop-shadow(0 4px 10px rgba(0,0,0,.28))' }}>{p.emoji}</span>
                 )}
 
-                {/* 광고 배지 */}
+                <span style={{ position: 'absolute', top: 6, right: 6, display: 'flex', gap: 4, alignItems: 'center' }}>
+                  {p.mine && (
+                    <span
+                      style={{
+                        background: 'rgba(0,0,0,.42)',
+                        color: '#fff',
+                        fontSize: 9,
+                        fontWeight: 800,
+                        padding: '2px 6px',
+                        borderRadius: 6,
+                      }}
+                    >
+                      내 글
+                    </span>
+                  )}
+                  {state.savedPosts.includes(p.id) && (
+                    <span style={{ color: '#fff', filter: 'drop-shadow(0 1px 2px rgba(0,0,0,.4))' }}>
+                      <IconBookmark fill />
+                    </span>
+                  )}
+                  {p.media === 'reel' && <ReelIcon />}
+                  {p.media === 'carousel' && <CarouselIcon />}
+                </span>
+
                 {p.sponsored && (
                   <span
                     style={{
@@ -109,7 +129,6 @@ export default function ArtContent() {
                   </span>
                 )}
 
-                {/* 하단 제목 */}
                 <span
                   style={{
                     position: 'absolute',
@@ -138,7 +157,7 @@ export default function ArtContent() {
 
       {/* 업로드 FAB */}
       <button
-        onClick={() => toast('내 작업물 업로드 · 준비 중 ✍️')}
+        onClick={() => setComposeOpen(true)}
         aria-label="게시물 올리기"
         style={{
           position: 'absolute',
@@ -170,10 +189,216 @@ export default function ArtContent() {
             if (!state.savedPosts.includes(active.id)) toast('저장함에 담았어요 🔖')
           }}
           onComment={() => toast('댓글 기능은 준비 중이에요 💬')}
+          onDelete={
+            active.mine
+              ? () => {
+                  deleteUserPost(active.id)
+                  setActiveId(null)
+                  toast('게시물을 삭제했어요')
+                }
+              : undefined
+          }
           onClose={() => setActiveId(null)}
         />
       )}
+
+      {/* 업로드 작성 */}
+      <ComposeSheet
+        open={composeOpen}
+        authorName={state.name || '나'}
+        onClose={() => setComposeOpen(false)}
+        onSubmit={(post) => {
+          addUserPost(post)
+          setComposeOpen(false)
+          setCat('전체')
+          setActiveId(post.id)
+          toast('게시물을 올렸어요 🎉')
+        }}
+      />
     </div>
+  )
+}
+
+function ComposeSheet({
+  open,
+  authorName,
+  onClose,
+  onSubmit,
+}: {
+  open: boolean
+  authorName: string
+  onClose: () => void
+  onSubmit: (post: FeedPost) => void
+}) {
+  const [image, setImage] = useState<string | null>(null)
+  const [emoji, setEmoji] = useState('🎨')
+  const [category, setCategory] = useState<Exclude<ContentCategory, '전체'>>('작품')
+  const [title, setTitle] = useState('')
+  const [body, setBody] = useState('')
+  const [tags, setTags] = useState('')
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  function reset() {
+    setImage(null)
+    setEmoji('🎨')
+    setCategory('작품')
+    setTitle('')
+    setBody('')
+    setTags('')
+  }
+
+  function pickFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0]
+    if (!f) return
+    const reader = new FileReader()
+    reader.onload = () => setImage(String(reader.result))
+    reader.readAsDataURL(f)
+  }
+
+  function submit() {
+    if (!title.trim()) return
+    const id = `p_${Date.now().toString(36)}_${Math.floor(Math.random() * 1e4)}`
+    const post: FeedPost = {
+      id,
+      author: authorName,
+      handle: `@${authorName}`,
+      avatar: '🙂',
+      category,
+      gradient: CATEGORY_GRADIENT[category],
+      emoji,
+      title: title.trim(),
+      body: body.trim() || '오늘의 예술 한 조각을 남겼어요.',
+      tags: tags
+        .split(/[,#\s]+/)
+        .map((t) => t.trim())
+        .filter(Boolean)
+        .slice(0, 4),
+      likes: 0,
+      saves: 0,
+      mine: true,
+      image: image ?? undefined,
+    }
+    onSubmit(post)
+    reset()
+  }
+
+  return (
+    <Sheet open={open} onClose={onClose} title="새 게시물">
+      {/* 이미지/썸네일 */}
+      <div
+        onClick={() => fileRef.current?.click()}
+        style={{
+          aspectRatio: '16 / 10',
+          borderRadius: 16,
+          background: image ? `center/cover no-repeat url(${image})` : CATEGORY_GRADIENT[category],
+          display: 'grid',
+          placeItems: 'center',
+          cursor: 'pointer',
+          marginBottom: 14,
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {!image && <span style={{ fontSize: 54, filter: 'drop-shadow(0 4px 12px rgba(0,0,0,.3))' }}>{emoji}</span>}
+        <span
+          style={{
+            position: 'absolute',
+            bottom: 10,
+            right: 10,
+            background: 'rgba(0,0,0,.5)',
+            color: '#fff',
+            fontSize: 12,
+            fontWeight: 700,
+            padding: '6px 12px',
+            borderRadius: 999,
+            backdropFilter: 'blur(4px)',
+          }}
+        >
+          📷 {image ? '사진 변경' : '사진 올리기'}
+        </span>
+      </div>
+      <input ref={fileRef} type="file" accept="image/*" onChange={pickFile} style={{ display: 'none' }} />
+
+      {/* 이미지 없을 때 이모지 선택 */}
+      {!image && (
+        <>
+          <div className="cLabel">대표 이모지</div>
+          <div className="hscroll" style={{ margin: '0 0 14px', padding: 0 }}>
+            {EMOJIS.map((e) => (
+              <button
+                key={e}
+                onClick={() => setEmoji(e)}
+                style={{
+                  fontSize: 22,
+                  width: 44,
+                  height: 44,
+                  borderRadius: 12,
+                  flexShrink: 0,
+                  background: emoji === e ? 'var(--accent-soft)' : 'var(--surface-2)',
+                  border: emoji === e ? '2px solid var(--accent)' : '1px solid var(--line)',
+                }}
+              >
+                {e}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* 카테고리 */}
+      <div className="cLabel">카테고리</div>
+      <div className="row" style={{ gap: 7, flexWrap: 'wrap', marginBottom: 14 }}>
+        {POST_CATS.map((c) => (
+          <button key={c} className={category === c ? 'chip is-active' : 'chip'} onClick={() => setCategory(c)}>
+            {c}
+          </button>
+        ))}
+      </div>
+
+      {/* 제목 */}
+      <div className="cLabel">제목</div>
+      <input
+        className="cInput"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="예: 오늘 마주친 골목의 벽화"
+        maxLength={40}
+      />
+
+      {/* 본문 */}
+      <div className="cLabel" style={{ marginTop: 14 }}>내용</div>
+      <textarea
+        className="cInput"
+        value={body}
+        onChange={(e) => setBody(e.target.value)}
+        rows={3}
+        style={{ resize: 'none' }}
+        placeholder="느낀 점이나 이야기를 자유롭게 적어보세요."
+        maxLength={280}
+      />
+
+      {/* 태그 */}
+      <div className="cLabel" style={{ marginTop: 14 }}>태그</div>
+      <input
+        className="cInput"
+        value={tags}
+        onChange={(e) => setTags(e.target.value)}
+        placeholder="쉼표로 구분 · 예: 벽화, 산책"
+        maxLength={40}
+      />
+
+      <button className="btn btn--accent btn--block" style={{ marginTop: 20 }} disabled={!title.trim()} onClick={submit}>
+        게시하기
+      </button>
+
+      <style>{`
+        .cLabel{font-size:13px;font-weight:700;color:var(--ink-2);margin-bottom:8px;}
+        .cInput{width:100%;padding:13px 15px;border-radius:13px;border:1.6px solid var(--line-strong);
+          background:var(--surface);font-size:15px;color:var(--ink);outline:none;transition:border-color .15s;}
+        .cInput:focus{border-color:var(--accent);}
+        .cInput::placeholder{color:var(--ink-3);}
+      `}</style>
+    </Sheet>
   )
 }
 
@@ -184,6 +409,7 @@ function PostDetail({
   onLike,
   onSave,
   onComment,
+  onDelete,
   onClose,
 }: {
   post: FeedPost
@@ -192,6 +418,7 @@ function PostDetail({
   onLike: () => void
   onSave: () => void
   onComment: () => void
+  onDelete?: () => void
   onClose: () => void
 }) {
   return (
@@ -210,13 +437,17 @@ function PostDetail({
         <button onClick={onClose} aria-label="뒤로" style={{ fontSize: 24, lineHeight: 1, color: 'var(--ink)' }}>
           ‹
         </button>
-        <div className="appbar__title" style={{ fontSize: 17 }}>
+        <div className="appbar__title" style={{ fontSize: 17, flex: 1 }}>
           게시물
         </div>
+        {onDelete && (
+          <button onClick={onDelete} style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink-3)' }}>
+            삭제
+          </button>
+        )}
       </header>
 
       <div style={{ flex: 1, overflowY: 'auto' }}>
-        {/* 작성자 */}
         <div className="row" style={{ gap: 10, padding: '10px 16px' }}>
           <div
             style={{
@@ -239,7 +470,6 @@ function PostDetail({
           <span className="chip" style={{ padding: '4px 10px', fontSize: 11 }}>{post.category}</span>
         </div>
 
-        {/* 이미지 */}
         <div
           style={{
             position: 'relative',
@@ -247,9 +477,14 @@ function PostDetail({
             background: post.gradient,
             display: 'grid',
             placeItems: 'center',
+            overflow: 'hidden',
           }}
         >
-          <span style={{ fontSize: 108, filter: 'drop-shadow(0 8px 24px rgba(0,0,0,.25))' }}>{post.emoji}</span>
+          {post.image ? (
+            <img src={post.image} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          ) : (
+            <span style={{ fontSize: 108, filter: 'drop-shadow(0 8px 24px rgba(0,0,0,.25))' }}>{post.emoji}</span>
+          )}
           {post.sponsored && (
             <span
               style={{
@@ -270,7 +505,6 @@ function PostDetail({
           )}
         </div>
 
-        {/* 액션 */}
         <div className="row" style={{ gap: 18, padding: '12px 16px 4px', color: 'var(--ink)' }}>
           <button onClick={onLike} className="row" style={{ gap: 5, color: liked ? 'var(--accent)' : 'var(--ink)' }}>
             <IconHeart fill={liked} />
@@ -284,7 +518,6 @@ function PostDetail({
           </button>
         </div>
 
-        {/* 본문 */}
         <div style={{ padding: '4px 16px 32px' }}>
           <p style={{ margin: '4px 0 10px', fontSize: 15, lineHeight: 1.7, color: 'var(--ink)' }}>
             <b>{post.title}</b> — {post.body}

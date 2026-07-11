@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import type { ArtTypeId } from './data/artTypes'
-import { CHALLENGES, COMMUNITIES, type ChatMessage } from './data/content'
+import { CHALLENGES, COMMUNITIES, type ChatMessage, type FeedPost } from './data/content'
 import { applyTheme } from './data/themes'
 
 const KEY = 'anditgood.v1'
@@ -53,6 +53,7 @@ export interface AppState {
   certificates: Certificate[]
   savedPosts: string[]
   likedPosts: string[]
+  userPosts: FeedPost[] // 내가 올린 게시물
   joinedGroups: string[]
   roomMsgs: Record<string, ChatMessage[]> // 방별로 추가된 메시지(내 대화·내 미션 알림)
   themeId: string
@@ -73,6 +74,7 @@ const initialState: AppState = {
   certificates: [],
   savedPosts: [],
   likedPosts: [],
+  userPosts: [],
   joinedGroups: ['g1'],
   roomMsgs: {},
   themeId: 'apricot',
@@ -113,6 +115,8 @@ interface Store {
   toggleSave: (postId: string) => void
   toggleLike: (postId: string) => void
   toggleGroup: (groupId: string) => void
+  addUserPost: (post: FeedPost) => void
+  deleteUserPost: (id: string) => void
   sendChat: (roomId: string, text: string) => void
   setTheme: (themeId: string) => void
   setCustomColor: (hex: string) => void
@@ -139,7 +143,11 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AppState>(load)
 
   useEffect(() => {
-    localStorage.setItem(KEY, JSON.stringify(state))
+    try {
+      localStorage.setItem(KEY, JSON.stringify(state))
+    } catch {
+      // 저장 용량 초과(업로드 이미지 등) 시 조용히 무시 — 세션 내 상태는 유지됨
+    }
   }, [state])
 
   // 선택한 컬러 테마를 앱 전역에 적용
@@ -289,6 +297,11 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
             ? s.joinedGroups.filter((g) => g !== groupId)
             : [...s.joinedGroups, groupId],
         })),
+
+      addUserPost: (post) => setState((s) => ({ ...s, userPosts: [post, ...s.userPosts] })),
+
+      deleteUserPost: (id) =>
+        setState((s) => ({ ...s, userPosts: s.userPosts.filter((p) => p.id !== id) })),
 
       sendChat: (roomId, text) =>
         setState((s) => {
