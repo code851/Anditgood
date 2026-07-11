@@ -296,7 +296,7 @@ export default function Onboarding() {
         시작하기 ✨
       </button>
       <p className="muted" style={{ fontSize: 12.5, textAlign: 'center', marginTop: 12 }}>
-        가입 축하 캐시 20,000 지급 · 첫 뱃지 🌱 획득
+        가입 축하 열매 🌰 30개 지급 · 첫 뱃지 🌱 획득
       </p>
 
       <style>{`

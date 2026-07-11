@@ -1,5 +1,12 @@
 // ── 목업 데이터: 챌린지 / 예술 콘텐츠 / 커뮤니티 / 뱃지 ──
 
+// 완주 시 투자한 열매가 전달되는 예술 소외계층
+export interface Beneficiary {
+  name: string
+  group: string
+  emoji: string
+}
+
 export interface Challenge {
   id: string
   title: string
@@ -9,10 +16,10 @@ export interface Challenge {
   durationDays: number
   totalDays: number
   participants: number
-  stake: number // 예치 캐시(투자금)
-  reward: number // 완주 보상 캐시
+  stake: number // 투자하는 열매 (완주 시 전액 기부됨)
   badgeOnClear: string // 완주 시 획득 뱃지 id
   today: string // 오늘의 미션 문구
+  beneficiary: Beneficiary
 }
 
 export const CHALLENGES: Challenge[] = [
@@ -25,10 +32,10 @@ export const CHALLENGES: Challenge[] = [
     durationDays: 3,
     totalDays: 7,
     participants: 1284,
-    stake: 3000,
-    reward: 4500,
+    stake: 3,
     badgeOnClear: 'b_word',
     today: '오늘 스친 이미지 중 가장 오래 눈이 머문 것을 떠올려 한 줄로 남겨보세요.',
+    beneficiary: { name: '햇살 지역아동센터', group: '한부모가정 아이들', emoji: '🌤️' },
   },
   {
     id: 'c2',
@@ -39,10 +46,10 @@ export const CHALLENGES: Challenge[] = [
     durationDays: 6,
     totalDays: 14,
     participants: 862,
-    stake: 5000,
-    reward: 8000,
+    stake: 5,
     badgeOnClear: 'b_hand',
     today: '책상 위 아무 물건이나 5분간 관찰하며 선으로 옮겨보세요.',
+    beneficiary: { name: '느린걸음 미술공방', group: '발달장애 예술인', emoji: '🎨' },
   },
   {
     id: 'c3',
@@ -53,10 +60,10 @@ export const CHALLENGES: Challenge[] = [
     durationDays: 0,
     totalDays: 4,
     participants: 431,
-    stake: 10000,
-    reward: 16000,
+    stake: 8,
     badgeOnClear: 'b_step',
     today: '가고 싶었던 전시를 하나 정하고 방문 날짜를 캘린더에 적어두세요.',
+    beneficiary: { name: '다솜 보육원', group: '보호종료 청소년', emoji: '🏠' },
   },
   {
     id: 'c4',
@@ -67,10 +74,10 @@ export const CHALLENGES: Challenge[] = [
     durationDays: 2,
     totalDays: 12,
     participants: 2190,
-    stake: 2000,
-    reward: 3000,
+    stake: 2,
     badgeOnClear: 'b_eye',
     today: '오늘의 예술 상식 카드를 한 장 읽고, 새로 안 사실을 아카이브에 남겨요.',
+    beneficiary: { name: '밝은세상 문화모임', group: '시각장애인 예술활동', emoji: '👐' },
   },
   {
     id: 'c5',
@@ -81,10 +88,10 @@ export const CHALLENGES: Challenge[] = [
     durationDays: 0,
     totalDays: 10,
     participants: 654,
-    stake: 3000,
-    reward: 4500,
+    stake: 3,
     badgeOnClear: 'b_calm',
     today: '오늘 걸으며 들은 소리를 색 하나로 표현한다면 무슨 색일까요?',
+    beneficiary: { name: '고운소리 복지관', group: '저소득 어르신 음악교실', emoji: '🎵' },
   },
 ]
 

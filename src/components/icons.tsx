@@ -98,3 +98,30 @@ export const IconSpark = () => (
     <path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18" />
   </I>
 )
+
+// 열매 (투자·경험의 상징)
+export const IconSeed = () => (
+  <I>
+    <path d="M12 21c4.4 0 7-3 7-7 0-4.4-3.4-8.5-7-11-3.6 2.5-7 6.6-7 11 0 4 2.6 7 7 7Z" />
+    <path d="M12 21c0-4 0-7 0-9" />
+    <path d="M12 14c1.6 0 2.8-1 3.4-2.4" />
+  </I>
+)
+
+// 기부증서 (인장/메달)
+export const IconSeal = () => (
+  <I>
+    <path d="M12 3l2.1 1.4 2.5-.3 1 2.3 2.1 1.4-.6 2.5.6 2.5-2.1 1.4-1 2.3-2.5-.3L12 21l-2.1-1.5-2.5.3-1-2.3-2.1-1.4.6-2.5-.6-2.5 2.1-1.4 1-2.3 2.5.3L12 3Z" />
+    <path d="M9.5 12l1.8 1.8 3.4-3.6" />
+  </I>
+)
+
+// 컬러 설정 (팔레트)
+export const IconPalette = () => (
+  <I>
+    <path d="M12 3a9 9 0 0 0 0 18c1.4 0 2-1 2-2 0-1.3-1-1.5-1-2.6 0-.8.7-1.4 1.6-1.4H17a4 4 0 0 0 4-4c0-4.4-4-8-9-8Z" />
+    <circle cx="7.5" cy="11" r="1" fill="currentColor" stroke="none" />
+    <circle cx="10" cy="7.5" r="1" fill="currentColor" stroke="none" />
+    <circle cx="14" cy="7.5" r="1" fill="currentColor" stroke="none" />
+  </I>
+)

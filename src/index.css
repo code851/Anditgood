@@ -87,7 +87,8 @@ textarea {
   position: relative;
   width: 100%;
   max-width: var(--maxw);
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   background: var(--bg);
   overflow: hidden;
   display: flex;
@@ -110,6 +111,7 @@ textarea {
 /* ---------- 스크롤 영역 ---------- */
 .scroll {
   flex: 1;
+  min-height: 0; /* flex 자식이 내부 스크롤되도록 */
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -324,6 +326,58 @@ textarea {
     transform: scale(1);
     opacity: 1;
   }
+}
+
+/* ---------- 성장 캐릭터 ---------- */
+.buddy {
+  position: relative;
+  animation: bob 4s ease-in-out infinite;
+}
+.buddy__layer {
+  position: absolute;
+  inset: 0;
+}
+.buddy__gray {
+  filter: grayscale(1) brightness(1.06) contrast(0.92);
+  opacity: 0.5;
+}
+.buddy__color {
+  transition: clip-path 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1.2deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(1.2deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .buddy {
+    animation: none;
+  }
+  .buddy__color {
+    transition: none;
+  }
+}
+
+/* 컬러 스와치 */
+.swatch {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 16px;
+  border: 2px solid var(--line);
+  display: grid;
+  place-items: center;
+  transition: transform 0.12s;
+  position: relative;
+}
+.swatch:active {
+  transform: scale(0.94);
+}
+.swatch.is-active {
+  border-color: var(--ink);
 }
 
 .toast {

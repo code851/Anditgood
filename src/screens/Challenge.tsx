@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useStore } from '../store'
-import { CHALLENGES, BADGES, type Challenge } from '../data/content'
+import { CHALLENGES, type Challenge } from '../data/content'
 import { Sheet, ProgressBar, fmt, useToast } from '../components/ui'
-import { IconCheck, IconCoin, IconPlus } from '../components/icons'
+import { IconCheck, IconSeed, IconPlus } from '../components/icons'
 
 export default function ChallengeScreen() {
   const { state, joinChallenge, checkInChallenge } = useStore()
@@ -32,10 +32,10 @@ export default function ChallengeScreen() {
       return
     }
     const res = checkInChallenge(active.id, note.trim() || undefined)
-    if (res.rewarded && res.badge) {
-      toast(`완주! 🎉 ${BADGES[res.badge]?.emoji} 뱃지 획득`)
+    if (res.donated && res.certificate) {
+      toast(`완주! 🎁 열매가 ${res.certificate.beneficiaryGroup}에게 기부됐어요`)
     } else {
-      toast('오늘의 미션 완료 🔥 +캐시 적립')
+      toast('오늘의 미션 완료 🔥 잘하고 있어요')
     }
     setActive(null)
   }
@@ -47,9 +47,9 @@ export default function ChallengeScreen() {
           <div className="appbar__title">미션 · 챌린지</div>
           <div className="appbar__sub">오늘도 예술 한 조각, 해볼까요?</div>
         </div>
-        <div className="chip chip--accent">
-          <IconCoin />
-          {fmt(state.cash)}
+        <div className="chip chip--accent" title="투자 가능한 열매">
+          <IconSeed />
+          {fmt(state.seeds)}
         </div>
       </header>
 
@@ -95,7 +95,7 @@ export default function ChallengeScreen() {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontWeight: 800, fontSize: 15.5 }}>{ch.title}</div>
                       <div className="muted" style={{ fontSize: 12.5, marginTop: 2 }}>
-                        {j.progress} / {ch.totalDays}일 · 예치 {fmt(ch.stake)}
+                        {j.progress} / {ch.totalDays}일 · 열매 {fmt(ch.stake)} 투자
                       </div>
                     </div>
                   </div>
@@ -123,7 +123,7 @@ export default function ChallengeScreen() {
                       className="btn btn--ghost btn--block"
                       style={{ color: 'var(--sage)', cursor: 'default' }}
                     >
-                      <IconCheck /> 완주 완료 · 보상 {fmt(ch.reward)} 지급됨
+                      <IconCheck /> 완주 · 열매 {fmt(ch.stake)} {ch.beneficiary.group}에 기부됨
                     </div>
                   ) : (
                     <button
@@ -152,7 +152,7 @@ export default function ChallengeScreen() {
           <>
             <div className="sec">
               <span className="sec__title">새로운 챌린지</span>
-              <span className="sec__more">캐시를 걸고 완주 도전</span>
+              <span className="sec__more">투자하고 완주하면 기부로</span>
             </div>
             <div className="stack" style={{ gap: 12 }}>
               {explore.map((ch) => (
@@ -188,25 +188,36 @@ export default function ChallengeScreen() {
                     </div>
                   </div>
 
+                  {/* 투자 → 기부 안내 */}
                   <div
                     className="row"
-                    style={{ justifyContent: 'space-between', marginTop: 14, gap: 10 }}
+                    style={{
+                      gap: 9,
+                      marginTop: 13,
+                      background: 'var(--accent-soft)',
+                      borderRadius: 12,
+                      padding: '11px 13px',
+                    }}
                   >
-                    <div className="muted" style={{ fontSize: 12.5 }}>
-                      예치 <b style={{ color: 'var(--ink)' }}>{fmt(ch.stake)}</b> → 완주 시{' '}
-                      <b style={{ color: 'var(--accent-ink)' }}>{fmt(ch.reward)}</b>
+                    <span style={{ fontSize: 20 }}>{ch.beneficiary.emoji}</span>
+                    <div style={{ fontSize: 12.5, lineHeight: 1.5, color: 'var(--accent-ink)' }}>
+                      열매 <b>{fmt(ch.stake)}</b>개를 투자해 나를 위한 경험을 사고, 완주하면{' '}
+                      <b>{ch.beneficiary.group}</b>에게 그대로 기부돼요.
                     </div>
+                  </div>
+
+                  <div className="row" style={{ justifyContent: 'flex-end', marginTop: 12 }}>
                     <button
                       className="btn btn--accent"
-                      style={{ padding: '10px 16px', fontSize: 13.5 }}
-                      disabled={state.cash < ch.stake}
+                      style={{ padding: '11px 18px', fontSize: 13.5 }}
+                      disabled={state.seeds < ch.stake}
                       onClick={() => {
                         joinChallenge(ch.id)
                         toast(`'${ch.title}' 참여 시작!`)
                       }}
                     >
                       <IconPlus />
-                      {state.cash < ch.stake ? '캐시 부족' : '참여'}
+                      {state.seeds < ch.stake ? '열매 부족' : `열매 ${fmt(ch.stake)} 투자하기`}
                     </button>
                   </div>
                 </div>
