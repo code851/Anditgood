@@ -1,4 +1,4 @@
-// 참고 이미지 같은 선화(라인아트) 어린이.
+// 참고 이미지 같은 선화(라인아트) 어린이 — 옆으로 하나 묶은 머리, 활짝 웃는 얼굴, V넥 원피스.
 // 기본은 색 없는 '틀(선)'만, 챌린지를 이어갈수록 앱 테마 색이 아래에서부터 차오른다.
 
 const INK = '#2b2622'
@@ -8,17 +8,20 @@ const HAIR = '#4a3a30'
 function ChildFill() {
   return (
     <svg viewBox="0 0 120 160" width="100%" height="100%" aria-hidden="true">
-      {/* 머리카락 */}
-      <ellipse cx="31" cy="43" rx="11" ry="15" fill={HAIR} />
-      <ellipse cx="89" cy="43" rx="11" ry="15" fill={HAIR} />
-      <path d="M33 47 Q35 19 60 18 Q85 19 87 47 Q72 34 60 35 Q48 34 33 47 Z" fill={HAIR} />
+      {/* 귀 */}
+      <circle cx="30" cy="58" r="7" fill={SKIN} />
+      <circle cx="90" cy="58" r="7" fill={SKIN} />
       {/* 얼굴 */}
-      <circle cx="60" cy="47" r="26" fill={SKIN} />
+      <circle cx="60" cy="54" r="30" fill={SKIN} />
+      {/* 옆으로 묶은 머리(포니테일) */}
+      <path d="M35 40 C18 26 7 33 14 46 C11 37 25 35 34 47 Z" fill={HAIR} />
+      {/* 머리 */}
+      <path d="M31 62 C24 42 30 23 60 22 C90 23 96 42 89 62 C82 48 72 42 60 46 C48 42 38 48 31 62 Z" fill={HAIR} />
       {/* 볼 */}
-      <circle cx="46" cy="55" r="5" fill="var(--accent)" opacity="0.32" />
-      <circle cx="74" cy="55" r="5" fill="var(--accent)" opacity="0.32" />
+      <circle cx="44" cy="60" r="5" fill="var(--accent)" opacity="0.28" />
+      <circle cx="76" cy="60" r="5" fill="var(--accent)" opacity="0.28" />
       {/* 원피스 (앱 테마 색) */}
-      <path d="M47 78 L73 78 L88 124 L32 124 Z" fill="var(--accent)" />
+      <path d="M49 92 L71 92 L86 133 L34 133 Z" fill="var(--accent)" />
     </svg>
   )
 }
@@ -27,35 +30,40 @@ function ChildLine() {
   return (
     <svg viewBox="0 0 120 160" width="100%" height="100%" aria-hidden="true">
       <g fill="none" stroke={INK} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
-        {/* 양갈래 머리 */}
-        <ellipse cx="31" cy="43" rx="11" ry="15" />
-        <ellipse cx="89" cy="43" rx="11" ry="15" />
-        <path d="M33 47 Q35 19 60 18 Q85 19 87 47" />
-        <path d="M33 47 Q48 34 60 35 Q72 34 87 47" />
+        {/* 귀 */}
+        <circle cx="30" cy="58" r="7" />
+        <circle cx="90" cy="58" r="7" />
         {/* 얼굴 */}
-        <circle cx="60" cy="47" r="26" />
+        <circle cx="60" cy="54" r="30" />
+        {/* 머리 외곽 + 가운데 가르마 */}
+        <path d="M31 62 C24 42 30 23 60 22 C90 23 96 42 89 62" />
+        <path d="M31 62 C38 48 48 42 60 46 C72 42 82 48 89 62" />
+        <path d="M60 23 L60 45" />
+        {/* 옆으로 묶은 머리 */}
+        <path d="M35 40 C18 26 7 33 14 46 C11 37 25 35 34 47" />
         {/* 눈 */}
-        <circle cx="51" cy="47" r="2.6" fill={INK} stroke="none" />
-        <circle cx="69" cy="47" r="2.6" fill={INK} stroke="none" />
-        {/* 웃는 입 */}
-        <path d="M50 55 Q60 65 70 55" />
-        {/* 목 */}
-        <path d="M55 71 L55 78" />
-        <path d="M65 71 L65 78" />
+        <ellipse cx="49" cy="54" rx="3" ry="4.2" fill={INK} stroke="none" />
+        <ellipse cx="71" cy="54" rx="3" ry="4.2" fill={INK} stroke="none" />
+        {/* 활짝 웃는 입 */}
+        <path d="M46 64 Q60 82 74 64" />
+        {/* 목 + V넥 */}
+        <path d="M56 84 L56 90" />
+        <path d="M64 84 L64 90" />
+        <path d="M54 91 L60 100 L66 91" />
         {/* 원피스 */}
-        <path d="M47 78 L73 78 L88 124 L32 124 Z" />
+        <path d="M49 92 L71 92 L86 133 L34 133 Z" />
         {/* 팔 */}
-        <path d="M48 82 L27 97" />
-        <path d="M72 82 L93 97" />
+        <path d="M51 98 L26 106" />
+        <path d="M69 98 L94 106" />
         {/* 손가락 */}
-        <path d="M27 97 l-4 -1 M27 97 l-3 3 M27 97 l1 4" />
-        <path d="M93 97 l4 -1 M93 97 l3 3 M93 97 l-1 4" />
+        <path d="M26 106 l-4 -2 M26 106 l-3 2 M26 106 l0 4" />
+        <path d="M94 106 l4 -2 M94 106 l3 2 M94 106 l0 4" />
         {/* 다리 */}
-        <path d="M52 124 L52 147" />
-        <path d="M68 124 L68 147" />
+        <path d="M53 133 L53 150" />
+        <path d="M67 133 L67 150" />
         {/* 발 */}
-        <path d="M52 147 q-7 1 -9 -2" />
-        <path d="M68 147 q7 1 9 -2" />
+        <path d="M53 150 q-8 1 -10 -2" />
+        <path d="M67 150 q8 1 10 -2" />
       </g>
     </svg>
   )
