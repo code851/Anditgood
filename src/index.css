@@ -333,15 +333,12 @@ textarea {
   position: relative;
   animation: bob 4s ease-in-out infinite;
 }
-.buddy__layer {
+.buddy__fill,
+.buddy__line {
   position: absolute;
   inset: 0;
 }
-.buddy__gray {
-  filter: grayscale(1) brightness(1.06) contrast(0.92);
-  opacity: 0.5;
-}
-.buddy__color {
+.buddy__fill {
   transition: clip-path 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 @keyframes bob {
@@ -357,7 +354,7 @@ textarea {
   .buddy {
     animation: none;
   }
-  .buddy__color {
+  .buddy__fill {
     transition: none;
   }
 }

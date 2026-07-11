@@ -92,7 +92,7 @@ export default function MyPage() {
               />
             </div>
             <div className="muted" style={{ fontSize: 11.5, textAlign: 'center', marginTop: 7 }}>
-              미션을 이어갈수록 아이의 색이 차올라요 · {days}/{GROWTH_CAP}
+              미션을 이어갈수록 아이가 색으로 채워져요 · {days}/{GROWTH_CAP}
             </div>
           </div>
         </div>
@@ -365,9 +365,9 @@ export default function MyPage() {
       </Sheet>
 
       {/* 컬러 설정 시트 */}
-      <Sheet open={colorOpen} onClose={() => setColorOpen(false)} title="🎨 앱 컬러 설정">
+      <Sheet open={colorOpen} onClose={() => setColorOpen(false)} title="🎨 앱 전체 컬러">
         <p className="muted" style={{ fontSize: 13.5, margin: '0 0 16px', lineHeight: 1.5 }}>
-          나에게 어울리는 색으로 앱 분위기를 바꿔보세요.
+          앱 전체 색과 나의 아이 색이 함께 바뀌어요. 나에게 어울리는 색을 골라보세요.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
           {THEMES.map((t) => {
