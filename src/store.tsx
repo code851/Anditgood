@@ -55,6 +55,7 @@ export interface AppState {
   likedPosts: string[]
   joinedGroups: string[]
   themeId: string
+  customColor?: string
 }
 
 const initialState: AppState = {
@@ -111,6 +112,7 @@ interface Store {
   toggleLike: (postId: string) => void
   toggleGroup: (groupId: string) => void
   setTheme: (themeId: string) => void
+  setCustomColor: (hex: string) => void
   reset: () => void
 }
 
@@ -139,8 +141,8 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
 
   // 선택한 컬러 테마를 앱 전역에 적용
   useEffect(() => {
-    applyTheme(state.themeId)
-  }, [state.themeId])
+    applyTheme(state.themeId, state.customColor)
+  }, [state.themeId, state.customColor])
 
   const store = useMemo<Store>(() => {
     const set = (patch: Partial<AppState>) => setState((s) => ({ ...s, ...patch }))
@@ -264,6 +266,8 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
         })),
 
       setTheme: (themeId) => setState((s) => ({ ...s, themeId })),
+
+      setCustomColor: (hex) => setState((s) => ({ ...s, themeId: 'custom', customColor: hex })),
 
       reset: () => {
         localStorage.removeItem(KEY)

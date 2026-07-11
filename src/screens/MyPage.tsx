@@ -2,13 +2,13 @@ import { useState } from 'react'
 import { useStore, GROWTH_CAP, totalCheckIns, type Certificate } from '../store'
 import { ART_TYPES } from '../data/artTypes'
 import { CHALLENGES, BADGES, type Badge } from '../data/content'
-import { THEMES } from '../data/themes'
+import { THEMES, CUSTOM_ID } from '../data/themes'
 import GrowBuddy from '../components/GrowBuddy'
 import { Sheet, fmt, useToast } from '../components/ui'
 import { IconSeed, IconSeal, IconPalette } from '../components/icons'
 
 export default function MyPage() {
-  const { state, set, setTheme, reset } = useStore()
+  const { state, set, setTheme, setCustomColor, reset } = useStore()
   const toast = useToast()
   const [editOpen, setEditOpen] = useState(false)
   const [certOpen, setCertOpen] = useState(false)
@@ -367,27 +367,83 @@ export default function MyPage() {
       {/* 컬러 설정 시트 */}
       <Sheet open={colorOpen} onClose={() => setColorOpen(false)} title="🎨 앱 전체 컬러">
         <p className="muted" style={{ fontSize: 13.5, margin: '0 0 16px', lineHeight: 1.5 }}>
-          앱 전체 색과 나의 아이 색이 함께 바뀌어요. 나에게 어울리는 색을 골라보세요.
+          앱 전체 색과 나의 아이 색이 함께 바뀌어요. 마음에 드는 색을 고르거나
+          직접 만들어 나만의 개성을 담아보세요.
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
+
+        {/* 직접 고르기 (커스텀) */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 14,
+            padding: 14,
+            borderRadius: 16,
+            background: 'var(--surface-2)',
+            marginBottom: 18,
+          }}
+        >
+          <label
+            className={state.themeId === CUSTOM_ID ? 'swatch is-active' : 'swatch'}
+            style={{
+              width: 54,
+              height: 54,
+              flexShrink: 0,
+              cursor: 'pointer',
+              position: 'relative',
+              background:
+                state.themeId === CUSTOM_ID && state.customColor
+                  ? state.customColor
+                  : 'conic-gradient(from 210deg,#e8734a,#dda63f,#8fa771,#4c9aa0,#6f88ab,#9481b0,#d5847f,#e8734a)',
+            }}
+          >
+            <input
+              type="color"
+              value={state.customColor ?? '#e8734a'}
+              onChange={(e) => setCustomColor(e.target.value)}
+              style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
+            />
+            <span style={{ color: '#fff', fontWeight: 900, fontSize: 18, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,.35))' }}>
+              {state.themeId === CUSTOM_ID ? '✓' : '＋'}
+            </span>
+          </label>
+          <div style={{ lineHeight: 1.4 }}>
+            <div style={{ fontSize: 14.5, fontWeight: 800 }}>내 색 직접 만들기</div>
+            <div className="muted" style={{ fontSize: 12.5 }}>
+              {state.themeId === CUSTOM_ID && state.customColor
+                ? `현재 ${state.customColor.toUpperCase()}`
+                : '색을 눌러 원하는 색을 골라요'}
+            </div>
+          </div>
+        </div>
+
+        <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--ink-3)', marginBottom: 10 }}>
+          추천 팔레트
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
           {THEMES.map((t) => {
             const active = state.themeId === t.id
             return (
               <button
                 key={t.id}
+                title={t.name}
                 onClick={() => {
                   setTheme(t.id)
                   toast(`${t.name} 컬러로 바꿨어요`)
                 }}
-                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7 }}
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}
               >
                 <span
                   className={active ? 'swatch is-active' : 'swatch'}
-                  style={{ background: `linear-gradient(140deg, ${t.soft}, ${t.accent})` }}
+                  style={{ background: t.accent }}
                 >
-                  {active && <span style={{ color: '#fff', fontWeight: 900, fontSize: 20 }}>✓</span>}
+                  {active && (
+                    <span style={{ color: '#fff', fontWeight: 900, fontSize: 18, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,.3))' }}>
+                      ✓
+                    </span>
+                  )}
                 </span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: active ? 'var(--ink)' : 'var(--ink-3)' }}>
+                <span style={{ fontSize: 10.5, fontWeight: 700, color: active ? 'var(--ink)' : 'var(--ink-3)' }}>
                   {t.name}
                 </span>
               </button>
