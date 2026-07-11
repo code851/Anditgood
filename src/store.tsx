@@ -72,7 +72,7 @@ const initialState: AppState = {
   savedPosts: [],
   likedPosts: [],
   joinedGroups: ['g1'],
-  themeId: 'terracotta',
+  themeId: 'apricot',
 }
 
 // 캐릭터가 완전히 색을 되찾는 데 필요한 누적 인증 수

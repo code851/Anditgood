@@ -1,22 +1,21 @@
-// 사용자가 직접 고르는 '앱 전체' 컬러 테마
-// accent 계열뿐 아니라 배경/서피스까지 은은하게 물들여 앱 전체 분위기를 바꾼다.
+// 사용자가 직접 고르는 '앱 전체' 컬러 테마 — 그림책 수채 톤(따뜻한 파스텔)
 export interface Theme {
   id: string
   name: string
   accent: string
   soft: string
   ink: string
-  bg: string // 앱 바탕
-  surface2: string // 보조 표면
+  bg: string
+  surface2: string
 }
 
 export const THEMES: Theme[] = [
-  { id: 'terracotta', name: '테라코타', accent: '#c8613b', soft: '#f0d9cd', ink: '#8a3d1f', bg: '#f4efe7', surface2: '#faf6ef' },
-  { id: 'sage', name: '세이지', accent: '#6f7a5a', soft: '#e4e8d8', ink: '#47503a', bg: '#eef1e8', surface2: '#f5f7ef' },
-  { id: 'plum', name: '플럼', accent: '#7b5769', soft: '#efe1e9', ink: '#532f42', bg: '#f2ecef', surface2: '#f9f3f6' },
-  { id: 'gold', name: '골드', accent: '#b58b3c', soft: '#f1e6cd', ink: '#7a5a1f', bg: '#f4efe3', surface2: '#faf6ea' },
-  { id: 'ocean', name: '오션', accent: '#4d7c8a', soft: '#d7e6ea', ink: '#2f5661', bg: '#e9f0f1', surface2: '#f1f6f7' },
-  { id: 'coral', name: '코랄', accent: '#d1687f', soft: '#f6dbe2', ink: '#9c3b52', bg: '#f6ecef', surface2: '#fcf4f6' },
+  { id: 'apricot', name: '살구', accent: '#e8734a', soft: '#f8ddca', ink: '#b0512c', bg: '#f7f1e6', surface2: '#fbf5ea' },
+  { id: 'sage', name: '세이지', accent: '#8fa771', soft: '#e3e9d3', ink: '#5c6f45', bg: '#f1f2e7', surface2: '#f7f8ee' },
+  { id: 'mustard', name: '머스터드', accent: '#dda63f', soft: '#f5e7c1', ink: '#97671b', bg: '#f6f1e3', surface2: '#fbf6ea' },
+  { id: 'dustyblue', name: '더스티블루', accent: '#6f88ab', soft: '#dce4ef', ink: '#435a7d', bg: '#edf0f4', surface2: '#f4f7fb' },
+  { id: 'rose', name: '로즈', accent: '#d5847f', soft: '#f3d9d3', ink: '#a5544f', bg: '#f6ede9', surface2: '#fbf4f1' },
+  { id: 'lilac', name: '라일락', accent: '#9481b0', soft: '#e6e0f0', ink: '#5f4f7e', bg: '#f0edf4', surface2: '#f7f4fb' },
 ]
 
 export function applyTheme(id: string) {

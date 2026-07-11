@@ -4,30 +4,30 @@
    ============================================================ */
 
 :root {
-  /* 지면 / 표면 */
-  --bg: #f4efe7;
-  --surface: #ffffff;
-  --surface-2: #faf6ef;
-  --surface-sunken: #ece5da;
+  /* 지면 / 표면 — 그림책 크림 톤 */
+  --bg: #f7f1e6;
+  --surface: #fffdf8;
+  --surface-2: #fbf5ea;
+  --surface-sunken: #ece1cf;
 
-  /* 텍스트 */
-  --ink: #201b16;
-  --ink-2: #5c5248;
-  --ink-3: #938779;
+  /* 텍스트 — 부드러운 세피아 */
+  --ink: #3f342c;
+  --ink-2: #6d5c4e;
+  --ink-3: #9c8b79;
 
-  /* 강조 */
-  --accent: #c8613b;      /* 테라코타 */
-  --accent-soft: #f0d9cd;
-  --accent-ink: #8a3d1f;
+  /* 강조 (기본: 살구) */
+  --accent: #e8734a;
+  --accent-soft: #f8ddca;
+  --accent-ink: #b0512c;
 
   /* 보조 강조 */
-  --gold: #b58b3c;
-  --sage: #6f7a5a;
-  --plum: #7b5769;
+  --gold: #dda63f;
+  --sage: #8fa771;
+  --plum: #9481b0;
 
   /* 경계/그림자 */
-  --line: #e3d9cb;
-  --line-strong: #d3c6b3;
+  --line: #e8ddca;
+  --line-strong: #d9c9b0;
   --shadow-sm: 0 1px 2px rgba(60, 45, 30, 0.06);
   --shadow-md: 0 6px 20px rgba(60, 45, 30, 0.10);
   --shadow-lg: 0 18px 44px rgba(60, 45, 30, 0.16);
