@@ -202,17 +202,23 @@ export const FEED: FeedPost[] = [
   },
 ]
 
-// ── 커뮤니티 ──
+// ── 커뮤니티 (소규모 채팅방, 최대 6명) ──
+export const ROOM_CAPACITY = 6
+
+export interface Member {
+  name: string
+  avatar: string
+}
+
 export interface Community {
   id: string
   name: string
   kind: '오픈' | '지정'
   emoji: string
   desc: string
-  members: number
-  activeToday: number
-  lastMessage: string
   color: string
+  challengeId: string // 이 방이 함께하는 챌린지
+  roster: Member[] // 나를 제외한 참여자 (최대 6명까지 채워짐)
 }
 
 export const COMMUNITIES: Community[] = [
@@ -221,46 +227,132 @@ export const COMMUNITIES: Community[] = [
     name: '한 문장 감상단',
     kind: '오픈',
     emoji: '✍️',
-    desc: '오늘 마음에 남은 작품을 한 문장으로 나누는 오픈 그룹',
-    members: 1820,
-    activeToday: 214,
-    lastMessage: '이 그림 앞에서 왜 눈물이 났을까요…',
+    desc: '오늘 마음에 남은 작품을 한 문장으로 나눠요',
     color: '#7b5769',
+    challengeId: 'c1',
+    roster: [
+      { name: '서현지', avatar: '🐰' },
+      { name: '민준', avatar: '🐻' },
+      { name: '유나', avatar: '🐤' },
+    ],
   },
   {
     id: 'g2',
+    name: '5분 드로잉 크루',
+    kind: '지정',
+    emoji: '🎨',
+    desc: '드로잉 챌린지 인증을 함께 올리는 소모임',
+    color: '#c8613b',
+    challengeId: 'c2',
+    roster: [
+      { name: '도윤', avatar: '🦊' },
+      { name: '서현지', avatar: '🐰' },
+      { name: '하람', avatar: '🐨' },
+      { name: '지우', avatar: '🐧' },
+    ],
+  },
+  {
+    id: 'g3',
     name: '주말 전시 메이트',
     kind: '오픈',
     emoji: '🚶',
     desc: '함께 전시 보러 갈 사람을 찾고 후기를 나눠요',
-    members: 940,
-    activeToday: 88,
-    lastMessage: '토요일 오전 국현 같이 가실 분?',
     color: '#6f7a5a',
-  },
-  {
-    id: 'g3',
-    name: '5분 드로잉 소모임',
-    kind: '지정',
-    emoji: '🎨',
-    desc: '드로잉 챌린지 참여자 전용 인증 그룹',
-    members: 62,
-    activeToday: 41,
-    lastMessage: '오늘 인증 올렸어요! 다들 화이팅 🔥',
-    color: '#c8613b',
+    challengeId: 'c3',
+    roster: [
+      { name: '수아', avatar: '🐹' },
+      { name: '건우', avatar: '🐢' },
+    ],
   },
   {
     id: 'g4',
-    name: '예술 상식 스터디',
+    name: '3분 예술 상식방',
     kind: '지정',
     emoji: '📖',
-    desc: '주 3회 상식 챌린지 멤버가 함께 복습하는 그룹',
-    members: 128,
-    activeToday: 33,
-    lastMessage: '임파스토 예시 작품 정리해봤어요',
+    desc: '주 3회 상식 챌린지 멤버의 복습방',
     color: '#b58b3c',
+    challengeId: 'c4',
+    roster: [
+      { name: '예린', avatar: '🐱' },
+      { name: '태오', avatar: '🐯' },
+      { name: '민준', avatar: '🐻' },
+    ],
+  },
+  {
+    id: 'g5',
+    name: '고요 산책 클럽',
+    kind: '오픈',
+    emoji: '🎧',
+    desc: '저자극 사운드 산책을 나누는 잔잔한 방',
+    color: '#6f88ab',
+    challengeId: 'c5',
+    roster: [
+      { name: '나리', avatar: '🦉' },
+      { name: '준서', avatar: '🐳' },
+      { name: '소민', avatar: '🐭' },
+    ],
+  },
+  {
+    id: 'g6',
+    name: '오늘의 감상 나눔 (마감)',
+    kind: '오픈',
+    emoji: '🌙',
+    desc: '정원이 가득 찬 인기 감상방',
+    color: '#9481b0',
+    challengeId: 'c1',
+    roster: [
+      { name: '하윤', avatar: '🐰' },
+      { name: '지호', avatar: '🐻' },
+      { name: '아인', avatar: '🐤' },
+      { name: '루아', avatar: '🦊' },
+      { name: '시우', avatar: '🐨' },
+      { name: '초록', avatar: '🐸' },
+    ],
   },
 ]
+
+// ── 채팅 메시지 ──
+export interface ChatMessage {
+  id: string
+  kind: 'chat' | 'mission' // 일반 대화 / 미션 완료 알림
+  author: string
+  avatar: string
+  text: string
+  date: string // ISO
+  mine?: boolean
+}
+
+// 방별 시드 대화 (미션 완료 알림 포함)
+export const ROOM_SEED: Record<string, ChatMessage[]> = {
+  g1: [
+    { id: 's1', kind: 'chat', author: '유나', avatar: '🐤', text: '다들 오늘 어떤 작품 보셨어요?', date: '2026-07-11T00:10:00.000Z' },
+    { id: 's2', kind: 'mission', author: '서현지', avatar: '🐰', text: '하루 한 작품, 한 문장', date: '2026-07-11T00:22:00.000Z' },
+    { id: 's3', kind: 'chat', author: '서현지', avatar: '🐰', text: '지하철 광고 속 색 조합이 오늘따라 예뻐 보였어요 :)', date: '2026-07-11T00:23:00.000Z' },
+    { id: 's4', kind: 'mission', author: '민준', avatar: '🐻', text: '하루 한 작품, 한 문장', date: '2026-07-11T00:40:00.000Z' },
+  ],
+  g2: [
+    { id: 's1', kind: 'chat', author: '도윤', avatar: '🦊', text: '오늘 5분 드로잉 다들 하셨나요 ✏️', date: '2026-07-11T00:05:00.000Z' },
+    { id: 's2', kind: 'mission', author: '하람', avatar: '🐨', text: '5분 낙서 드로잉', date: '2026-07-11T00:18:00.000Z' },
+    { id: 's3', kind: 'chat', author: '하람', avatar: '🐨', text: '머그컵 그렸는데 손잡이가 자꾸 이상해요 😂', date: '2026-07-11T00:19:00.000Z' },
+    { id: 's4', kind: 'mission', author: '지우', avatar: '🐧', text: '5분 낙서 드로잉', date: '2026-07-11T00:31:00.000Z' },
+  ],
+  g3: [
+    { id: 's1', kind: 'chat', author: '수아', avatar: '🐹', text: '토요일 오전 국현 같이 가실 분 있나요?', date: '2026-07-10T23:50:00.000Z' },
+    { id: 's2', kind: 'chat', author: '건우', avatar: '🐢', text: '저요! 11시 어때요?', date: '2026-07-10T23:58:00.000Z' },
+  ],
+  g4: [
+    { id: 's1', kind: 'mission', author: '예린', avatar: '🐱', text: '주 3회 예술 상식', date: '2026-07-11T00:12:00.000Z' },
+    { id: 's2', kind: 'chat', author: '예린', avatar: '🐱', text: '오늘 상식카드 임파스토 정리해봤어요!', date: '2026-07-11T00:13:00.000Z' },
+    { id: 's3', kind: 'mission', author: '태오', avatar: '🐯', text: '주 3회 예술 상식', date: '2026-07-11T00:26:00.000Z' },
+  ],
+  g5: [
+    { id: 's1', kind: 'chat', author: '나리', avatar: '🦉', text: '오늘 산책하며 들은 소리는 연한 하늘색이었어요', date: '2026-07-11T00:02:00.000Z' },
+    { id: 's2', kind: 'mission', author: '준서', avatar: '🐳', text: '저자극 사운드 산책', date: '2026-07-11T00:20:00.000Z' },
+  ],
+  g6: [
+    { id: 's1', kind: 'chat', author: '하윤', avatar: '🐰', text: '여긴 정원이 꽉 찼네요 😌', date: '2026-07-10T22:00:00.000Z' },
+  ],
+}
 
 // ── 뱃지 ──
 export interface Badge {

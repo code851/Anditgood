@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import type { ArtTypeId } from './data/artTypes'
-import { CHALLENGES } from './data/content'
+import { CHALLENGES, COMMUNITIES, type ChatMessage } from './data/content'
 import { applyTheme } from './data/themes'
 
 const KEY = 'anditgood.v1'
@@ -54,6 +54,7 @@ export interface AppState {
   savedPosts: string[]
   likedPosts: string[]
   joinedGroups: string[]
+  roomMsgs: Record<string, ChatMessage[]> // 방별로 추가된 메시지(내 대화·내 미션 알림)
   themeId: string
   customColor?: string
 }
@@ -73,6 +74,7 @@ const initialState: AppState = {
   savedPosts: [],
   likedPosts: [],
   joinedGroups: ['g1'],
+  roomMsgs: {},
   themeId: 'apricot',
 }
 
@@ -111,6 +113,7 @@ interface Store {
   toggleSave: (postId: string) => void
   toggleLike: (postId: string) => void
   toggleGroup: (groupId: string) => void
+  sendChat: (roomId: string, text: string) => void
   setTheme: (themeId: string) => void
   setCustomColor: (hex: string) => void
   reset: () => void
@@ -227,7 +230,29 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
           if (newStreak >= 7 && !badges.includes('b_streak7')) {
             badges = [...badges, 'b_streak7']
           }
-          return { ...s, joined, badges, certificates, streak: newStreak, archive }
+
+          // 내가 참여한 방(같은 챌린지)에 미션 완료 알림을 띄운다
+          let roomMsgs = s.roomMsgs
+          const rooms = COMMUNITIES.filter(
+            (r) => s.joinedGroups.includes(r.id) && r.challengeId === id,
+          )
+          if (rooms.length) {
+            roomMsgs = { ...s.roomMsgs }
+            for (const r of rooms) {
+              const notice: ChatMessage = {
+                id: makeId(),
+                kind: 'mission',
+                author: s.name || '나',
+                avatar: '🙂',
+                text: ch.title,
+                date: new Date().toISOString(),
+                mine: true,
+              }
+              roomMsgs[r.id] = [...(roomMsgs[r.id] ?? []), notice]
+            }
+          }
+
+          return { ...s, joined, badges, certificates, streak: newStreak, archive, roomMsgs }
         })
         return result
       },
@@ -264,6 +289,23 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
             ? s.joinedGroups.filter((g) => g !== groupId)
             : [...s.joinedGroups, groupId],
         })),
+
+      sendChat: (roomId, text) =>
+        setState((s) => {
+          const msg: ChatMessage = {
+            id: makeId(),
+            kind: 'chat',
+            author: s.name || '나',
+            avatar: '🙂',
+            text,
+            date: new Date().toISOString(),
+            mine: true,
+          }
+          return {
+            ...s,
+            roomMsgs: { ...s.roomMsgs, [roomId]: [...(s.roomMsgs[roomId] ?? []), msg] },
+          }
+        }),
 
       setTheme: (themeId) => setState((s) => ({ ...s, themeId })),
 
