@@ -9,7 +9,7 @@ import {
 import { Sheet, fmt, useToast } from '../components/ui'
 import { IconHeart, IconBookmark, IconChat, IconPlus } from '../components/icons'
 
-const CATS: ContentCategory[] = ['전체', '작품', '상식', '전시·정보', '뉴스', '저자극']
+const CATS: ContentCategory[] = ['전체', '1분 예술상식', '예술 칼럼', '문화예술 정보', '예술 뉴스']
 const POST_CATS = CATS.filter((c) => c !== '전체') as Exclude<ContentCategory, '전체'>[]
 const EMOJIS = ['🎨', '🖼️', '✏️', '🖌️', '📷', '🌻', '🌙', '🪷', '🏛️', '🎭', '📖', '🎧']
 
@@ -232,7 +232,7 @@ function ComposeSheet({
 }) {
   const [image, setImage] = useState<string | null>(null)
   const [emoji, setEmoji] = useState('🎨')
-  const [category, setCategory] = useState<Exclude<ContentCategory, '전체'>>('작품')
+  const [category, setCategory] = useState<Exclude<ContentCategory, '전체'>>('1분 예술상식')
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
   const [tags, setTags] = useState('')
@@ -241,7 +241,7 @@ function ComposeSheet({
   function reset() {
     setImage(null)
     setEmoji('🎨')
-    setCategory('작품')
+    setCategory('1분 예술상식')
     setTitle('')
     setBody('')
     setTags('')
