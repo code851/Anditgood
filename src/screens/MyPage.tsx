@@ -30,6 +30,20 @@ export default function MyPage() {
     .map((j) => ({ j, ch: CHALLENGES.find((c) => c.id === j.challengeId)! }))
     .filter((x) => x.ch)
 
+  // 뱃지 탭에 보여줄 발급 예시 증서
+  const c0 = CHALLENGES[0]
+  const sampleCert: Certificate = {
+    id: 'sample',
+    serial: 'AG-2026-0000',
+    challengeId: c0.id,
+    challengeTitle: c0.title,
+    amount: c0.stake,
+    beneficiaryName: c0.beneficiary.name,
+    beneficiaryGroup: c0.beneficiary.group,
+    beneficiaryEmoji: c0.beneficiary.emoji,
+    date: '2026-05-08T00:00:00.000Z',
+  }
+
   function saveProfile() {
     set({ name: name.trim() || state.name, bio: bio.trim(), goal: goal.trim() })
     setEditOpen(false)
@@ -344,24 +358,20 @@ export default function MyPage() {
       </div>
 
       {/* 기부증서 시트 */}
-      <Sheet open={certOpen} onClose={() => setCertOpen(false)} title="🎁 나의 기부증서">
-        {state.certificates.length === 0 ? (
-          <div style={{ textAlign: 'center', color: 'var(--ink-3)', padding: '24px 0 8px' }}>
-            <div style={{ fontSize: 30, marginBottom: 8 }}>📜</div>
-            <div style={{ fontWeight: 700, color: 'var(--ink-2)' }}>아직 발급된 증서가 없어요</div>
-            <div style={{ fontSize: 13, marginTop: 4, lineHeight: 1.5 }}>
-              챌린지를 완주하면 투자한 열매가 예술 소외계층에 기부되고,
-              <br />
-              그 나눔을 증명하는 기부증서가 이곳에 정식으로 모여요.
-            </div>
+      <Sheet open={certOpen} onClose={() => setCertOpen(false)} title="🌹 감사 카드 · 기부증서">
+        <p className="muted" style={{ fontSize: 13, margin: '0 0 16px', lineHeight: 1.55 }}>
+          챌린지를 완주하면 투자한 열매가 예술 소외계층에 전해지고, 그 나눔이
+          감사 카드로 발급돼요. 어디에 전해졌는지도 확인할 수 있어요.
+        </p>
+        <div className="stack" style={{ gap: 16, paddingBottom: 4 }}>
+          {state.certificates.map((c) => (
+            <CertificateCard key={c.id} c={c} name={state.name} />
+          ))}
+          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink-3)', margin: '4px 2px -4px' }}>
+            {state.certificates.length ? '발급 예시' : '아직 발급 전 · 이렇게 전달돼요 (예시)'}
           </div>
-        ) : (
-          <div className="stack" style={{ gap: 14, paddingBottom: 4 }}>
-            {state.certificates.map((c) => (
-              <CertificateCard key={c.id} c={c} name={state.name} />
-            ))}
-          </div>
-        )}
+          <CertificateCard c={sampleCert} name={state.name} sample />
+        </div>
       </Sheet>
 
       {/* 컬러 설정 시트 */}
@@ -550,94 +560,119 @@ function MiniStat({ emoji, label, value }: { emoji: string; label: string; value
   )
 }
 
-function CertificateCard({ c, name }: { c: Certificate; name: string }) {
+const CARNATION_RED = '#c8322f'
+const CARNATION_GREEN = '#4e7a49'
+
+function Carnation({ size = 44 }: { size?: number }) {
+  return (
+    <svg viewBox="0 0 48 64" width={size} height={(size * 64) / 48} aria-hidden="true">
+      {/* 줄기 */}
+      <path d="M24 30 C24 42 24 50 24 60" stroke={CARNATION_GREEN} strokeWidth="2.4" fill="none" strokeLinecap="round" />
+      {/* 잎 */}
+      <path d="M24 45 C16 43 12 47 11 53 C19 53 24 50 24 45 Z" fill={CARNATION_GREEN} />
+      <path d="M24 39 C31 37 36 40 37 45 C29 46 24 44 24 39 Z" fill={CARNATION_GREEN} />
+      {/* 꽃받침 */}
+      <path d="M19 27 L29 27 L26 34 L22 34 Z" fill={CARNATION_GREEN} />
+      {/* 꽃 (러플) */}
+      <path
+        d="M9 24 Q10 7 24 6 Q38 7 39 24 Q33 16 29 21 Q31 10 24 15 Q17 10 19 21 Q15 16 9 24 Z"
+        fill={CARNATION_RED}
+      />
+      <path
+        d="M16 20 Q18 13 20 20 M24 11 L24 21 M28 20 Q30 13 32 20"
+        stroke="#fff"
+        strokeWidth="1"
+        opacity="0.55"
+        fill="none"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
+function CertificateCard({ c, name, sample }: { c: Certificate; name: string; sample?: boolean }) {
   return (
     <div
       style={{
-        border: '1.5px solid var(--line-strong)',
-        borderRadius: 16,
-        padding: 4,
-        background: 'linear-gradient(160deg,#fffdf9,#f6efe4)',
+        position: 'relative',
+        border: '1.5px solid #e6c9c4',
+        borderRadius: 18,
+        background: 'linear-gradient(160deg,#fffdfb,#fbeeec)',
+        padding: '20px 18px 18px',
+        overflow: 'hidden',
       }}
     >
+      {sample && (
+        <span
+          style={{
+            position: 'absolute',
+            top: 12,
+            right: 12,
+            background: '#fff',
+            border: `1px solid ${CARNATION_RED}55`,
+            color: CARNATION_RED,
+            fontSize: 10.5,
+            fontWeight: 800,
+            padding: '3px 9px',
+            borderRadius: 999,
+          }}
+        >
+          예시
+        </span>
+      )}
+
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Carnation />
+        </div>
+        <div style={{ fontSize: 11, letterSpacing: 2.5, color: CARNATION_RED, fontWeight: 800, marginTop: 4 }}>
+          THANK YOU
+        </div>
+        <div style={{ fontSize: 23, fontWeight: 800, margin: '1px 0 0', letterSpacing: -0.5 }}>감사합니다</div>
+      </div>
+
+      <p style={{ fontSize: 13.5, lineHeight: 1.75, color: 'var(--ink-2)', textAlign: 'center', margin: '12px 4px 16px' }}>
+        <b style={{ color: 'var(--ink)' }}>{name || '회원'}</b>님의{' '}
+        <b style={{ color: 'var(--ink)' }}>「{c.challengeTitle}」</b> 완주 덕분에,
+        <br />
+        아래 이웃에게 예술을 누릴 한 조각이 전해졌어요.
+      </p>
+
+      {/* 받은 곳 (명확히) + 전한 나눔 */}
       <div
         style={{
-          border: '1px solid var(--line-strong)',
+          border: `1.5px dashed ${CARNATION_RED}55`,
           borderRadius: 13,
-          padding: '18px 16px',
+          padding: '13px 14px',
+          display: 'flex',
+          gap: 11,
+          alignItems: 'center',
+          background: '#fff',
         }}
       >
-        <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div>
-            <div style={{ fontSize: 11, letterSpacing: 3, color: 'var(--gold)', fontWeight: 800 }}>
-              DONATION
-            </div>
-            <div style={{ fontSize: 18, fontWeight: 800, marginTop: 2 }}>기부증서</div>
-          </div>
-          <div
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: '50%',
-              background: 'var(--accent-soft)',
-              color: 'var(--accent-ink)',
-              display: 'grid',
-              placeItems: 'center',
-            }}
-          >
-            <IconSeal />
-          </div>
+        <span style={{ fontSize: 26 }}>{c.beneficiaryEmoji}</span>
+        <div style={{ lineHeight: 1.35, minWidth: 0 }}>
+          <div style={{ fontSize: 10.5, fontWeight: 800, color: CARNATION_RED }}>받은 곳</div>
+          <div style={{ fontSize: 15, fontWeight: 800 }}>{c.beneficiaryName}</div>
+          <div className="muted" style={{ fontSize: 12 }}>{c.beneficiaryGroup}</div>
         </div>
+        <div style={{ marginLeft: 'auto', textAlign: 'right', flexShrink: 0 }}>
+          <div style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--ink-3)' }}>전한 나눔</div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: CARNATION_RED }}>열매 {c.amount}</div>
+        </div>
+      </div>
 
-        <p style={{ fontSize: 13.5, lineHeight: 1.7, color: 'var(--ink-2)', margin: '14px 0' }}>
-          <b style={{ color: 'var(--ink)' }}>{name || '회원'}</b>님은{' '}
-          <b style={{ color: 'var(--ink)' }}>「{c.challengeTitle}」</b> 챌린지를 완주하여, 투자한 열매{' '}
-          <b style={{ color: 'var(--accent-ink)' }}>{c.amount}개</b>를{' '}
-          <b style={{ color: 'var(--ink)' }}>{c.beneficiaryGroup}</b>에게 예술 경험으로 나누어 전했습니다.
-        </p>
-
-        <div
-          className="row"
-          style={{ gap: 10, background: 'var(--surface-2)', borderRadius: 11, padding: '11px 13px' }}
-        >
-          <span style={{ fontSize: 22 }}>{c.beneficiaryEmoji}</span>
-          <div style={{ lineHeight: 1.3 }}>
-            <div style={{ fontSize: 13.5, fontWeight: 800 }}>{c.beneficiaryName}</div>
-            <div className="muted" style={{ fontSize: 11.5 }}>{c.beneficiaryGroup}</div>
-          </div>
-        </div>
-
-        <div
-          className="row"
-          style={{
-            justifyContent: 'space-between',
-            marginTop: 14,
-            fontSize: 11,
-            color: 'var(--ink-3)',
-          }}
-        >
-          <span style={{ fontVariantNumeric: 'tabular-nums' }}>No. {c.serial}</span>
-          <span>
-            {new Date(c.date).toLocaleDateString('ko-KR', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </span>
-        </div>
-        <div
-          style={{
-            marginTop: 10,
-            paddingTop: 10,
-            borderTop: '1px dashed var(--line-strong)',
-            textAlign: 'right',
-            fontSize: 12.5,
-            fontWeight: 800,
-            letterSpacing: 1,
-          }}
-        >
-          안디잇굿 🎨
-        </div>
+      <div
+        className="row"
+        style={{ justifyContent: 'space-between', marginTop: 14, fontSize: 11, color: 'var(--ink-3)' }}
+      >
+        <span style={{ fontVariantNumeric: 'tabular-nums' }}>No. {c.serial}</span>
+        <span>
+          {new Date(c.date).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}
+        </span>
+      </div>
+      <div style={{ marginTop: 8, textAlign: 'right', fontSize: 12.5, fontWeight: 800, letterSpacing: 0.5, color: CARNATION_RED }}>
+        안디잇굿 나눔 🌹
       </div>
     </div>
   )
