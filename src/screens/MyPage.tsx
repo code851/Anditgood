@@ -37,7 +37,7 @@ export default function MyPage() {
   }
 
   const growthCopy =
-    ratio >= 1 ? '활짝 피어났어요 🌸' : days === 0 ? '오늘 첫 물을 주어요' : '함께 자라는 중'
+    ratio >= 1 ? '완성! 레벨 MAX ✦' : days === 0 ? '오늘부터 채워가요' : '함께 자라는 중'
 
   return (
     <div className="scroll">
@@ -92,7 +92,7 @@ export default function MyPage() {
               />
             </div>
             <div className="muted" style={{ fontSize: 11.5, textAlign: 'center', marginTop: 7 }}>
-              미션을 이어갈수록 아이가 색으로 채워져요 · {days}/{GROWTH_CAP}
+              미션을 이어갈수록 아이가 또렷하게 채워져요 · {days}/{GROWTH_CAP}
             </div>
           </div>
         </div>
@@ -367,8 +367,8 @@ export default function MyPage() {
       {/* 컬러 설정 시트 */}
       <Sheet open={colorOpen} onClose={() => setColorOpen(false)} title="🎨 앱 전체 컬러">
         <p className="muted" style={{ fontSize: 13.5, margin: '0 0 16px', lineHeight: 1.5 }}>
-          앱 전체 색과 나의 아이 색이 함께 바뀌어요. 마음에 드는 색을 고르거나
-          직접 만들어 나만의 개성을 담아보세요.
+          앱 전체 분위기를 나에게 어울리는 색으로 바꿔보세요. 마음에 드는 색을
+          고르거나 직접 만들어 나만의 개성을 담아보세요.
         </p>
 
         {/* 직접 고르기 (커스텀) */}
