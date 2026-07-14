@@ -379,23 +379,16 @@ function BadgeDetail({
               <div style={{ fontSize: 14.5, fontWeight: 800 }}>{ch.title}</div>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 10, background: 'var(--surface-2)', borderRadius: 13, padding: '13px 14px', marginTop: 10 }}>
-            <span style={{ fontSize: 24 }}>{ch.beneficiary.emoji}</span>
-            <div>
-              <div className="muted" style={{ fontSize: 11, fontWeight: 700 }}>기부처</div>
-              <div style={{ fontSize: 14.5, fontWeight: 800 }}>{ch.beneficiary.name}</div>
-              <div className="muted" style={{ fontSize: 12 }}>{ch.beneficiary.group}</div>
-            </div>
-          </div>
-
           {cert ? (
             <div style={{ marginTop: 14 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink-3)', marginBottom: 8 }}>발급된 기부증서</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink-3)', marginBottom: 8 }}>
+                전달한 곳 · 발급된 기부증서
+              </div>
               <CertificateCard c={cert} name={state.name} unit={currency} />
             </div>
           ) : (
             <p className="muted" style={{ fontSize: 12.5, textAlign: 'center', marginTop: 14, lineHeight: 1.5 }}>
-              이 챌린지를 완주하면 기부가 전해지고, 감사 카드(기부증서)가 발급돼요.
+              이 챌린지를 완주하면 기부 대상을 직접 골라 나눔을 전하고, 감사 카드(기부증서)가 발급돼요.
             </p>
           )}
         </>

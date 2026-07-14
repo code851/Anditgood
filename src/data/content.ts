@@ -1,97 +1,256 @@
 // ── 목업 데이터: 챌린지 / 예술 콘텐츠 / 커뮤니티 / 뱃지 ──
 
-// 완주 시 투자한 열매가 전달되는 예술 소외계층
-export interface Beneficiary {
+// 완주 후 사용자가 선택하는 기부 대상 (시각적으로 고름)
+export interface DonationTarget {
+  id: string
   name: string
   group: string
   emoji: string
+  gradient: string
+  blurb: string
 }
 
 export interface Challenge {
   id: string
   title: string
-  summary: string
-  tag: string
+  tag: string // 예술 카테고리
   emoji: string
-  durationDays: number
-  totalDays: number
+  color: string
+  gradient: string
+  totalDays: number // 약 30일, 챌린지마다 상이
   participants: number
-  stake: number // 투자하는 열매 (완주 시 전액 기부됨)
-  badgeOnClear: string // 완주 시 획득 뱃지 id
-  today: string // 오늘의 미션 문구
-  beneficiary: Beneficiary
+  suggested: number // 기본 제안 투자량
+  intro: string // 챌린지의 깊이/목적
+  dailyMissions: string[] // 날마다 다른 깊이 있는 미션 (day 로 순환)
+  badgeOnClear: string
+}
+
+export function dailyMission(ch: Challenge, dayIndex: number): string {
+  return ch.dailyMissions[dayIndex % ch.dailyMissions.length]
 }
 
 export const CHALLENGES: Challenge[] = [
   {
     id: 'c1',
-    title: '하루 한 작품, 한 문장',
-    summary: '매일 마음에 남은 작품 하나를 한 문장으로 기록해요.',
-    tag: '감상',
+    title: '서른 번의 응시',
+    tag: '감상·글',
     emoji: '🖼️',
-    durationDays: 3,
-    totalDays: 7,
+    color: '#8f6f88',
+    gradient: 'linear-gradient(150deg,#8f6f88,#4a3340)',
+    totalDays: 30,
     participants: 1284,
-    stake: 3,
+    suggested: 5,
+    intro: '매일 한 작품을 오래 응시하고, 떠오른 생각을 한 문장으로 남깁니다. 서른 번의 응시 끝에, 문장들 사이에서 몰랐던 나를 만나요.',
     badgeOnClear: 'b_word',
-    today: '오늘 스친 이미지 중 가장 오래 눈이 머문 것을 떠올려 한 줄로 남겨보세요.',
-    beneficiary: { name: '햇살 지역아동센터', group: '한부모가정 아이들', emoji: '🌤️' },
+    dailyMissions: [
+      '오늘 눈이 가장 오래 머문 이미지를 떠올려, 그 앞에서 든 첫 감정을 한 문장으로 적어보세요.',
+      '좋았던 작품 하나를 골라, 왜 좋았는지 ‘나’를 주어로 설명해보세요.',
+      '불편했던 이미지를 떠올리고, 그 불편함이 내 안의 무엇을 건드렸는지 적어보세요.',
+      '말로 설명하기 어려운 장면을 색 하나로 표현한다면? 그 이유도 함께 남겨보세요.',
+      '오늘 본 것 중 내일도 기억하고 싶은 한 장면을 문장으로 붙잡아두세요.',
+      '누군가에게 보여주고 싶은 작품과, 그 사람에게 하고 싶은 말을 적어보세요.',
+      '지금 내 마음과 가장 닮은 작품을 고르고, 어디가 닮았는지 써보세요.',
+    ],
   },
   {
     id: 'c2',
-    title: '5분 낙서 드로잉',
-    summary: '잘 그리지 않아도 좋아요. 매일 5분, 손을 움직이는 습관.',
-    tag: '창작',
+    title: '매일의 드로잉 일기',
+    tag: '표현·드로잉',
     emoji: '✏️',
-    durationDays: 6,
-    totalDays: 14,
+    color: '#c8613b',
+    gradient: 'linear-gradient(150deg,#d98a5f,#8a3d1f)',
+    totalDays: 21,
     participants: 862,
-    stake: 5,
+    suggested: 4,
+    intro: '잘 그리는 게 목적이 아니에요. 매일 5분, 손끝으로 오늘의 나를 표현합니다. 스물한 장이 쌓이면 나만의 시선이 보여요.',
     badgeOnClear: 'b_hand',
-    today: '책상 위 아무 물건이나 5분간 관찰하며 선으로 옮겨보세요.',
-    beneficiary: { name: '느린걸음 미술공방', group: '발달장애 예술인', emoji: '🎨' },
+    dailyMissions: [
+      '지금 눈앞의 물건 하나를 5분간 관찰하며 선으로 옮겨보세요.',
+      '오늘의 기분을 추상적인 선과 도형만으로 그려보세요.',
+      '기억 속 한 장면을 떠오르는 대로 그려보세요. 정확하지 않아도 좋아요.',
+      '한 가지 색(또는 한 자루 펜)만으로 오늘을 그려보세요.',
+      '대상만 보고 종이는 보지 않는 ‘블라인드 드로잉’을 해보세요.',
+      '오늘 만난 사람 또는 나 자신을 캐릭터로 그려보세요.',
+      '내가 그린 것들 중 하나를 골라 제목을 붙여보세요.',
+    ],
   },
   {
     id: 'c3',
-    title: '이번 달 전시 한 곳',
-    summary: '한 달에 한 번, 낯선 전시 공간으로 나가보는 챌린지.',
-    tag: '전시',
+    title: '낯선 곳으로 한 걸음',
+    tag: '경험·탐험',
     emoji: '🚪',
-    durationDays: 0,
-    totalDays: 4,
+    color: '#6f7a5a',
+    gradient: 'linear-gradient(150deg,#87a06f,#47533a)',
+    totalDays: 30,
     participants: 431,
-    stake: 8,
+    suggested: 8,
+    intro: '익숙함에서 매일 한 걸음씩. 낯선 예술 경험에 나를 노출시키며, 세계가 넓어지는 감각을 쌓아요.',
     badgeOnClear: 'b_step',
-    today: '가고 싶었던 전시를 하나 정하고 방문 날짜를 캘린더에 적어두세요.',
-    beneficiary: { name: '다솜 보육원', group: '보호종료 청소년', emoji: '🏠' },
+    dailyMissions: [
+      '가본 적 없는 전시·공간을 하나 검색해 위시리스트에 담아보세요.',
+      '평소 안 듣던 장르의 곡을 한 곡 끝까지 들어보세요.',
+      '오늘 지나친 거리에서 ‘작품’이라 부를 만한 장면을 하나 찾아보세요.',
+      '낯선 작가의 이름 하나를 익히고, 대표작 한 점을 봐두세요.',
+      '이번 주 갈 전시·공연을 하나 정하고 날짜를 적어보세요.',
+      '익숙한 길 대신 새로운 길로 걸으며 마주친 색을 기록해보세요.',
+    ],
   },
   {
     id: 'c4',
-    title: '주 3회 예술 상식',
-    summary: '3분이면 읽는 예술 상식으로 아는 만큼 보이는 눈 만들기.',
-    tag: '지식',
+    title: '아는 만큼의 세계',
+    tag: '지식·탐구',
     emoji: '📚',
-    durationDays: 2,
-    totalDays: 12,
+    color: '#b58b3c',
+    gradient: 'linear-gradient(150deg,#d3a94e,#7a5a1f)',
+    totalDays: 14,
     participants: 2190,
-    stake: 2,
+    suggested: 3,
+    intro: '매일 3분, 예술의 언어를 하나씩 익혀요. 아는 만큼 보이는 눈으로, 세상이 더 촘촘하게 들어옵니다.',
     badgeOnClear: 'b_eye',
-    today: '오늘의 예술 상식 카드를 한 장 읽고, 새로 안 사실을 아카이브에 남겨요.',
-    beneficiary: { name: '밝은세상 문화모임', group: '시각장애인 예술활동', emoji: '👐' },
+    dailyMissions: [
+      '오늘의 예술 용어 하나를 찾아 내 말로 다시 설명해보세요.',
+      '좋아하는 작품의 ‘기법’을 하나 알아보고 메모하세요.',
+      '한 미술 사조의 특징을 세 줄로 정리해보세요.',
+      '작가 한 명의 삶에서 인상 깊은 한 가지를 적어보세요.',
+      '오늘 배운 지식으로 다시 보고 싶은 작품을 골라보세요.',
+      '예술과 관련된 질문 하나를 만들고, 나만의 답을 적어보세요.',
+    ],
   },
   {
     id: 'c5',
-    title: '저자극 사운드 산책',
-    summary: '하루 10분, 잔잔한 음악과 함께 걷고 느낀 색을 남겨요.',
-    tag: '음악',
+    title: '소리로 그리는 하루',
+    tag: '음악·소리',
     emoji: '🎧',
-    durationDays: 0,
-    totalDays: 10,
+    color: '#4d7c8a',
+    gradient: 'linear-gradient(150deg,#5f93a0,#2f5661)',
+    totalDays: 28,
     participants: 654,
-    stake: 3,
+    suggested: 5,
+    intro: '매일 10분, 소리에 집중하며 오늘의 감정을 색과 말로 옮깁니다. 스물여덟 번의 귀 기울임이 마음을 정돈해요.',
     badgeOnClear: 'b_calm',
-    today: '오늘 걸으며 들은 소리를 색 하나로 표현한다면 무슨 색일까요?',
-    beneficiary: { name: '고운소리 복지관', group: '저소득 어르신 음악교실', emoji: '🎵' },
+    dailyMissions: [
+      '지금 들리는 소리에 집중해, 그 소리를 색 하나로 표현해보세요.',
+      '오늘의 기분에 어울리는 곡을 한 곡 고르고 이유를 적어보세요.',
+      '가사 없는 음악을 들으며 떠오른 장면을 문장으로 남겨보세요.',
+      '10분 산책하며 들은 소리들을 목록으로 적어보세요.',
+      '어릴 적 기억을 부르는 소리 하나를 떠올려보세요.',
+      '누군가에게 들려주고 싶은 곡과, 그 마음을 적어보세요.',
+      '침묵 속에 3분간 머물고, 그때의 마음을 기록해보세요.',
+    ],
+  },
+  {
+    id: 'c6',
+    title: '매일 한 컷의 시선',
+    tag: '사진·시선',
+    emoji: '📷',
+    color: '#9a7ba0',
+    gradient: 'linear-gradient(150deg,#9a7ba0,#533f5f)',
+    totalDays: 30,
+    participants: 977,
+    suggested: 5,
+    intro: '휴대폰 한 대면 충분해요. 매일 한 컷, 내 눈이 머문 곳을 남기며 나만의 시선을 발견합니다.',
+    badgeOnClear: 'b_lens',
+    dailyMissions: [
+      '오늘 가장 마음이 멈춘 순간을 한 컷 찍어보세요.',
+      '‘빛’을 주제로 한 장을 담아보세요.',
+      '발밑, 천장 등 평소 안 보던 각도로 찍어보세요.',
+      '같은 대상을 세 가지 다른 방식으로 담아보세요.',
+      '색 하나를 정하고, 그 색을 찾아 하루를 담아보세요.',
+      '누군가에게 보여주고 싶은 오늘의 한 컷을 골라보세요.',
+    ],
+  },
+  {
+    id: 'c7',
+    title: '목소리를 내는 연습',
+    tag: '목소리·표현',
+    emoji: '🎤',
+    color: '#d97b7f',
+    gradient: 'linear-gradient(150deg,#d97b7f,#8a3d4a)',
+    totalDays: 21,
+    participants: 540,
+    suggested: 4,
+    intro: '표현은 근육이에요. 매일 짧게, 내 생각을 소리 내어 말하거나 씁니다. 스물한 번이면 목소리에 힘이 붙어요.',
+    badgeOnClear: 'b_voice',
+    dailyMissions: [
+      '오늘 느낀 것을 30초 동안 소리 내어 말해보세요(녹음해도 좋아요).',
+      '좋아하는 문장을 낭독하고, 왜 좋은지 말해보세요.',
+      '‘나는 ___할 때 살아있음을 느낀다’를 채워 말해보세요.',
+      '오늘의 의견 하나를 한 문단으로 표현해보세요.',
+      '누군가에게 전하지 못한 말을 글로 적어보세요.',
+      '내 하루를 한 편의 짧은 이야기로 말해보세요.',
+    ],
+  },
+  {
+    id: 'c8',
+    title: '몸으로 말하기',
+    tag: '움직임·표현',
+    emoji: '🕺',
+    color: '#6f9e73',
+    gradient: 'linear-gradient(150deg,#6f9e73,#37543a)',
+    totalDays: 21,
+    participants: 388,
+    suggested: 4,
+    intro: '매일 잠깐, 몸의 언어로 오늘을 표현합니다. 서툴러도 나만의 리듬으로, 몸이 기억하는 감정을 꺼내요.',
+    badgeOnClear: 'b_move',
+    dailyMissions: [
+      '지금 기분을 한 동작으로 표현해보세요.',
+      '좋아하는 곡에 맞춰 30초 자유롭게 움직여보세요.',
+      '느리게 걷기 3분, 몸의 감각에 집중해보세요.',
+      '손끝만으로 오늘의 감정을 표현해보세요.',
+      '거울 앞에서 나를 향해 응원 동작 하나를 해보세요.',
+      '숨에 집중하며 1분간 스트레칭하고 느낌을 적어보세요.',
+    ],
+  },
+]
+
+export const DONATION_TARGETS: DonationTarget[] = [
+  {
+    id: 't_kids',
+    name: '햇살 지역아동센터',
+    group: '한부모가정 아이들',
+    emoji: '🌤️',
+    gradient: 'linear-gradient(160deg,#ffd9a3,#e8895f)',
+    blurb: '미술 재료가 부족한 아이들에게 그림 도구를 전해요.',
+  },
+  {
+    id: 't_dev',
+    name: '느린걸음 미술공방',
+    group: '발달장애 예술인',
+    emoji: '🎨',
+    gradient: 'linear-gradient(160deg,#c9e0b8,#7fa86a)',
+    blurb: '느리지만 빛나는 작가들의 창작을 응원해요.',
+  },
+  {
+    id: 't_teen',
+    name: '다솜 보육원',
+    group: '보호종료 청소년',
+    emoji: '🏠',
+    gradient: 'linear-gradient(160deg,#bcd6ea,#6f88ab)',
+    blurb: '홀로서기를 앞둔 청소년의 문화생활을 함께해요.',
+  },
+  {
+    id: 't_blind',
+    name: '밝은세상 문화모임',
+    group: '시각장애인 예술활동',
+    emoji: '👐',
+    gradient: 'linear-gradient(160deg,#e5d3ef,#9481b0)',
+    blurb: '손끝으로 예술을 만나는 시간을 만들어요.',
+  },
+  {
+    id: 't_senior',
+    name: '고운소리 복지관',
+    group: '저소득 어르신 음악교실',
+    emoji: '🎵',
+    gradient: 'linear-gradient(160deg,#f2d7b0,#c99a54)',
+    blurb: '어르신들의 노래하는 오후를 선물해요.',
+  },
+  {
+    id: 't_hospital',
+    name: '반짝별 소아병동',
+    group: '입원 아동',
+    emoji: '🧸',
+    gradient: 'linear-gradient(160deg,#f6c6cf,#d97b8a)',
+    blurb: '병실에서도 그림 그릴 수 있게 도와요.',
   },
 ]
 
@@ -612,7 +771,10 @@ export const BADGES: Record<string, Badge> = {
   b_hand: { id: 'b_hand', name: '움직이는 손', emoji: '🖐️', desc: '드로잉 챌린지 완주' },
   b_step: { id: 'b_step', name: '문 밖의 세계', emoji: '🚪', desc: '전시 방문 챌린지 완주' },
   b_eye: { id: 'b_eye', name: '아는 만큼 보이는 눈', emoji: '👁️', desc: '지식 챌린지 완주' },
-  b_calm: { id: 'b_calm', name: '고요한 산책자', emoji: '🍃', desc: '저자극 챌린지 완주' },
+  b_calm: { id: 'b_calm', name: '고요한 산책자', emoji: '🍃', desc: '음악·소리 챌린지 완주' },
+  b_lens: { id: 'b_lens', name: '보는 눈', emoji: '📷', desc: '사진 챌린지 완주' },
+  b_voice: { id: 'b_voice', name: '내 목소리', emoji: '🎤', desc: '목소리 챌린지 완주' },
+  b_move: { id: 'b_move', name: '나의 리듬', emoji: '🕺', desc: '움직임 챌린지 완주' },
   b_streak7: { id: 'b_streak7', name: '7일의 리듬', emoji: '🔥', desc: '7일 연속 미션 수행' },
   b_gift1: { id: 'b_gift1', name: '첫 나눔', emoji: '🎁', desc: '첫 기부를 전했어요' },
   b_gift3: { id: 'b_gift3', name: '세 번의 나눔', emoji: '🏆', desc: '세 번의 기부를 전했어요' },

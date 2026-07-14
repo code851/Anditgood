@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import type { ArtTypeId } from './data/artTypes'
-import { CHALLENGES, COMMUNITIES, type ChatMessage, type FeedPost } from './data/content'
+import { CHALLENGES, COMMUNITIES, DONATION_TARGETS, type ChatMessage, type FeedPost } from './data/content'
 import { applyTheme } from './data/themes'
 
 const KEY = 'anditgood.v1'
@@ -24,6 +24,8 @@ export interface JoinedChallenge {
   challengeId: string
   progress: number // 완료한 일수
   lastCheck?: string // 마지막 인증 날짜 (YYYY-MM-DD)
+  stake: number // 이 챌린지에 투자한 가치의 양
+  done?: boolean // 완주 + 기부까지 마쳤는지
 }
 
 // 완주로 발급되는 기부증서
@@ -32,10 +34,11 @@ export interface Certificate {
   serial: string
   challengeId: string
   challengeTitle: string
-  amount: number // 기부된 열매
+  amount: number // 기부된 양
   beneficiaryName: string
   beneficiaryGroup: string
   beneficiaryEmoji: string
+  message?: string // 대상에게 남긴 한 마디
   date: string // ISO
 }
 
@@ -110,11 +113,13 @@ interface Store {
     bio: string
     goal: string
   }) => void
-  joinChallenge: (id: string) => void
-  checkInChallenge: (
-    id: string,
-    note?: string,
-  ) => { donated: boolean; badge?: string; certificate?: Certificate }
+  joinChallenge: (id: string, amount: number) => void
+  checkInChallenge: (id: string, note?: string) => { day: number; completed: boolean }
+  finalizeDonation: (args: {
+    challengeId: string
+    targetId: string
+    message: string
+  }) => Certificate | null
   addArchive: (entry: Omit<ArchiveEntry, 'id' | 'date'>) => void
   toggleSave: (postId: string) => void
   toggleLike: (postId: string) => void
@@ -179,99 +184,97 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
           badges: s.badges.includes('b_start') ? s.badges : [...s.badges, 'b_start'],
         })),
 
-      joinChallenge: (id) =>
+      joinChallenge: (id, amount) =>
         setState((s) => {
-          if (s.joined.some((j) => j.challengeId === id)) return s
+          if (s.joined.some((j) => j.challengeId === id && !j.done)) return s
           const ch = CHALLENGES.find((c) => c.id === id)
-          const stake = ch?.stake ?? 0
-          if (s.seeds < stake) return s
+          if (!ch) return s
+          const amt = Math.max(1, Math.min(amount, s.seeds))
+          if (s.seeds < amt) return s
+          const others = s.joined.filter((j) => j.challengeId !== id)
           return {
             ...s,
-            seeds: s.seeds - stake, // 투자 (완주 시 기부로 전달)
-            joined: [...s.joined, { challengeId: id, progress: 0 }],
+            seeds: s.seeds - amt, // 투자 (완주 후 선택한 대상에게 기부로 전달)
+            joined: [...others, { challengeId: id, progress: 0, stake: amt }],
           }
         }),
 
+      // 매일의 미션 인증 (프로토타입: 하루 제한 없이 이어서 진행)
       checkInChallenge: (id, note) => {
-        let result: { donated: boolean; badge?: string; certificate?: Certificate } = {
-          donated: false,
-        }
+        let result = { day: 0, completed: false }
         setState((s) => {
           const ch = CHALLENGES.find((c) => c.id === id)
           if (!ch) return s
           const t = today()
           const joined = s.joined.map((j) => {
-            if (j.challengeId !== id) return j
-            if (j.lastCheck === t) return j // 하루 한 번
+            if (j.challengeId !== id || j.done) return j
             return { ...j, progress: Math.min(j.progress + 1, ch.totalDays), lastCheck: t }
           })
-          const target = joined.find((j) => j.challengeId === id)
-          if (!target || target.lastCheck !== t) return s // 이미 오늘 인증함
+          const target = joined.find((j) => j.challengeId === id && !j.done)
+          if (!target) return s
+          result = { day: target.progress, completed: target.progress >= ch.totalDays }
 
-          let badges = s.badges
-          let certificates = s.certificates
           const newStreak = s.streak + 1
+          let badges = s.badges
+          if (newStreak >= 7 && !badges.includes('b_streak7')) badges = [...badges, 'b_streak7']
+
           const archive = note
-            ? [
-                {
-                  id: makeId(),
-                  challengeId: id,
-                  text: note,
-                  date: new Date().toISOString(),
-                },
-                ...s.archive,
-              ]
+            ? [{ id: makeId(), challengeId: id, text: note, date: new Date().toISOString() }, ...s.archive]
             : s.archive
 
-          // 완주 판정 → 투자한 열매가 기부로 전달, 기부증서 발급
-          const already = s.certificates.some((c) => c.challengeId === id)
-          if (target.progress >= ch.totalDays && !already) {
-            const cert: Certificate = {
-              id: makeId(),
-              serial: `AG-${new Date().getFullYear()}-${String(certificates.length + 1).padStart(4, '0')}`,
-              challengeId: id,
-              challengeTitle: ch.title,
-              amount: ch.stake,
-              beneficiaryName: ch.beneficiary.name,
-              beneficiaryGroup: ch.beneficiary.group,
-              beneficiaryEmoji: ch.beneficiary.emoji,
-              date: new Date().toISOString(),
-            }
-            certificates = [cert, ...certificates]
-            if (!badges.includes(ch.badgeOnClear)) badges = [...badges, ch.badgeOnClear]
-            // 나눔 마일스톤 뱃지
-            if (!badges.includes('b_gift1')) badges = [...badges, 'b_gift1']
-            if (certificates.length >= 3 && !badges.includes('b_gift3')) badges = [...badges, 'b_gift3']
-            result = { donated: true, badge: ch.badgeOnClear, certificate: cert }
-          }
-          if (newStreak >= 7 && !badges.includes('b_streak7')) {
-            badges = [...badges, 'b_streak7']
-          }
-
-          // 내가 참여한 방(같은 챌린지)에 미션 완료 알림을 띄운다
+          // 같은 챌린지 방에 오늘의 미션 수행 알림
           let roomMsgs = s.roomMsgs
-          const rooms = COMMUNITIES.filter(
-            (r) => s.joinedGroups.includes(r.id) && r.challengeId === id,
-          )
+          const rooms = COMMUNITIES.filter((r) => s.joinedGroups.includes(r.id) && r.challengeId === id)
           if (rooms.length) {
             roomMsgs = { ...s.roomMsgs }
             for (const r of rooms) {
               const notice: ChatMessage = {
-                id: makeId(),
-                kind: 'mission',
-                author: s.name || '나',
-                avatar: '🙂',
-                text: ch.title,
-                date: new Date().toISOString(),
-                mine: true,
+                id: makeId(), kind: 'mission', author: s.name || '나', avatar: '🙂',
+                text: ch.title, date: new Date().toISOString(), mine: true,
               }
               roomMsgs[r.id] = [...(roomMsgs[r.id] ?? []), notice]
             }
           }
 
-          return { ...s, joined, badges, certificates, streak: newStreak, archive, roomMsgs }
+          return { ...s, joined, badges, streak: newStreak, archive, roomMsgs }
         })
         return result
+      },
+
+      // 완주 후: 선택한 대상에게 기부 → 증서 발급 + 뱃지 추가 + 챌린지 완료 처리
+      finalizeDonation: ({ challengeId, targetId, message }) => {
+        let cert: Certificate | null = null
+        setState((s) => {
+          const ch = CHALLENGES.find((c) => c.id === challengeId)
+          const tg = DONATION_TARGETS.find((t) => t.id === targetId)
+          const j = s.joined.find((x) => x.challengeId === challengeId && !x.done)
+          if (!ch || !tg || !j) return s
+
+          cert = {
+            id: makeId(),
+            serial: `AG-${new Date().getFullYear()}-${String(s.certificates.length + 1).padStart(4, '0')}`,
+            challengeId,
+            challengeTitle: ch.title,
+            amount: j.stake,
+            beneficiaryName: tg.name,
+            beneficiaryGroup: tg.group,
+            beneficiaryEmoji: tg.emoji,
+            message: message.trim() || undefined,
+            date: new Date().toISOString(),
+          }
+          const certificates = [cert, ...s.certificates]
+
+          let badges = s.badges
+          if (!badges.includes(ch.badgeOnClear)) badges = [...badges, ch.badgeOnClear]
+          if (!badges.includes('b_gift1')) badges = [...badges, 'b_gift1']
+          if (certificates.length >= 3 && !badges.includes('b_gift3')) badges = [...badges, 'b_gift3']
+
+          const joined = s.joined.map((x) =>
+            x.challengeId === challengeId && !x.done ? { ...x, done: true } : x,
+          )
+          return { ...s, certificates, badges, joined }
+        })
+        return cert
       },
 
       addArchive: (entry) =>

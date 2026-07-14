@@ -283,7 +283,7 @@ function ChatRoom({ room, onBack }: { room: Community; onBack: () => void }) {
   function certifyHere() {
     if (!ch || checkedToday) return
     const res = checkInChallenge(room.challengeId)
-    toast(res.donated ? '완주! 🎁 기부로 이어졌어요' : '오늘 미션 완료 🔥 방에 공유됐어요')
+    toast(res.completed ? '🎉 완주! 챌린지 탭에서 나눔을 전해요' : '오늘 미션 완료 🔥 방에 공유됐어요')
   }
 
   return (
