@@ -116,6 +116,15 @@ export const IconSeal = () => (
   </I>
 )
 
+// 아이템 박스
+export const IconBox = () => (
+  <I>
+    <path d="M3.5 7.5 12 4l8.5 3.5-8.5 3.5-8.5-3.5Z" />
+    <path d="M3.5 7.5V17L12 20.5 20.5 17V7.5" />
+    <path d="M12 11v9.5" />
+  </I>
+)
+
 // 컬러 설정 (팔레트)
 export const IconPalette = () => (
   <I>

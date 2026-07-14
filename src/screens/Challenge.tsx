@@ -2,13 +2,16 @@ import { useState } from 'react'
 import { useStore } from '../store'
 import { CHALLENGES, type Challenge } from '../data/content'
 import { Sheet, ProgressBar, fmt, useToast } from '../components/ui'
-import { IconCheck, IconSeed, IconPlus } from '../components/icons'
+import { IconCheck, IconPlus } from '../components/icons'
+import { currencyEmoji } from '../data/currency'
 
 export default function ChallengeScreen() {
   const { state, joinChallenge, checkInChallenge } = useStore()
   const toast = useToast()
   const [active, setActive] = useState<Challenge | null>(null)
   const [note, setNote] = useState('')
+  const currency = state.currencyLabel
+  const curEmoji = currencyEmoji(currency)
 
   const joinedIds = new Set(state.joined.map((j) => j.challengeId))
   const joined = state.joined
@@ -33,7 +36,7 @@ export default function ChallengeScreen() {
     }
     const res = checkInChallenge(active.id, note.trim() || undefined)
     if (res.donated && res.certificate) {
-      toast(`완주! 🎁 열매가 ${res.certificate.beneficiaryGroup}에게 기부됐어요`)
+      toast(`완주! 🎁 ${currency}이 ${res.certificate.beneficiaryGroup}에게 기부됐어요`)
     } else {
       toast('오늘의 미션 완료 🔥 잘하고 있어요')
     }
@@ -47,8 +50,8 @@ export default function ChallengeScreen() {
           <div className="appbar__title">미션 · 챌린지</div>
           <div className="appbar__sub">오늘도 예술 한 조각, 해볼까요?</div>
         </div>
-        <div className="chip chip--accent" title="투자 가능한 열매">
-          <IconSeed />
+        <div className="chip chip--accent" title={`투자 가능한 ${currency}`}>
+          <span style={{ fontSize: 15 }}>{curEmoji}</span>
           {fmt(state.seeds)}
         </div>
       </header>
@@ -95,7 +98,7 @@ export default function ChallengeScreen() {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontWeight: 800, fontSize: 15.5 }}>{ch.title}</div>
                       <div className="muted" style={{ fontSize: 12.5, marginTop: 2 }}>
-                        {j.progress} / {ch.totalDays}일 · 열매 {fmt(ch.stake)} 투자
+                        {j.progress} / {ch.totalDays}일 · {currency} {fmt(ch.stake)} 투자
                       </div>
                     </div>
                   </div>
@@ -123,7 +126,7 @@ export default function ChallengeScreen() {
                       className="btn btn--ghost btn--block"
                       style={{ color: 'var(--sage)', cursor: 'default' }}
                     >
-                      <IconCheck /> 완주 · 열매 {fmt(ch.stake)} {ch.beneficiary.group}에 기부됨
+                      <IconCheck /> 완주 · {currency} {fmt(ch.stake)} {ch.beneficiary.group}에 기부됨
                     </div>
                   ) : (
                     <button
@@ -201,7 +204,7 @@ export default function ChallengeScreen() {
                   >
                     <span style={{ fontSize: 20 }}>{ch.beneficiary.emoji}</span>
                     <div style={{ fontSize: 12.5, lineHeight: 1.5, color: 'var(--accent-ink)' }}>
-                      열매 <b>{fmt(ch.stake)}</b>개를 투자해 나를 위한 경험을 사고, 완주하면{' '}
+                      {currency} <b>{fmt(ch.stake)}</b>을 투자해 나를 위한 경험을 사고, 완주하면{' '}
                       <b>{ch.beneficiary.group}</b>에게 그대로 기부돼요.
                     </div>
                   </div>
@@ -217,7 +220,7 @@ export default function ChallengeScreen() {
                       }}
                     >
                       <IconPlus />
-                      {state.seeds < ch.stake ? '열매 부족' : `열매 ${fmt(ch.stake)} 투자하기`}
+                      {state.seeds < ch.stake ? `${currency} 부족` : `${currency} ${fmt(ch.stake)} 투자하기`}
                     </button>
                   </div>
                 </div>

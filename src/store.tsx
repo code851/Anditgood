@@ -58,6 +58,8 @@ export interface AppState {
   roomMsgs: Record<string, ChatMessage[]> // 방별로 추가된 메시지(내 대화·내 미션 알림)
   themeId: string
   customColor?: string
+  equippedItem: string | null // 캐릭터에 장착한 아이템
+  currencyLabel: string // 투자 단위 단어 (열매/경험/가치/영감 …)
 }
 
 const initialState: AppState = {
@@ -78,6 +80,8 @@ const initialState: AppState = {
   joinedGroups: ['g1'],
   roomMsgs: {},
   themeId: 'apricot',
+  equippedItem: null,
+  currencyLabel: '열매',
 }
 
 // 캐릭터가 완전히 색을 되찾는 데 필요한 누적 인증 수
@@ -120,6 +124,8 @@ interface Store {
   sendChat: (roomId: string, text: string) => void
   setTheme: (themeId: string) => void
   setCustomColor: (hex: string) => void
+  setEquippedItem: (id: string | null) => void
+  setCurrencyLabel: (word: string) => void
   reset: () => void
 }
 
@@ -233,6 +239,9 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
             }
             certificates = [cert, ...certificates]
             if (!badges.includes(ch.badgeOnClear)) badges = [...badges, ch.badgeOnClear]
+            // 나눔 마일스톤 뱃지
+            if (!badges.includes('b_gift1')) badges = [...badges, 'b_gift1']
+            if (certificates.length >= 3 && !badges.includes('b_gift3')) badges = [...badges, 'b_gift3']
             result = { donated: true, badge: ch.badgeOnClear, certificate: cert }
           }
           if (newStreak >= 7 && !badges.includes('b_streak7')) {
@@ -323,6 +332,11 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       setTheme: (themeId) => setState((s) => ({ ...s, themeId })),
 
       setCustomColor: (hex) => setState((s) => ({ ...s, themeId: 'custom', customColor: hex })),
+
+      setEquippedItem: (id) =>
+        setState((s) => ({ ...s, equippedItem: s.equippedItem === id ? null : id })),
+
+      setCurrencyLabel: (word) => setState((s) => ({ ...s, currencyLabel: word.trim() || '열매' })),
 
       reset: () => {
         localStorage.removeItem(KEY)

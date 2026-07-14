@@ -614,4 +614,6 @@ export const BADGES: Record<string, Badge> = {
   b_eye: { id: 'b_eye', name: '아는 만큼 보이는 눈', emoji: '👁️', desc: '지식 챌린지 완주' },
   b_calm: { id: 'b_calm', name: '고요한 산책자', emoji: '🍃', desc: '저자극 챌린지 완주' },
   b_streak7: { id: 'b_streak7', name: '7일의 리듬', emoji: '🔥', desc: '7일 연속 미션 수행' },
+  b_gift1: { id: 'b_gift1', name: '첫 나눔', emoji: '🎁', desc: '첫 기부를 전했어요' },
+  b_gift3: { id: 'b_gift3', name: '세 번의 나눔', emoji: '🏆', desc: '세 번의 기부를 전했어요' },
 }
