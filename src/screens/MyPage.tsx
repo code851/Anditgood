@@ -115,23 +115,27 @@ export default function MyPage() {
           <span className="sec__title">뱃지 컬렉션</span>
           <span className="sec__more">{earnedCount}/{allBadges.length}</span>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14 }}>
           {allBadges.map((b) => {
             const owned = state.badges.includes(b.id)
             return (
               <button
                 key={b.id}
                 onClick={() => setBadgeId(b.id)}
-                className="card"
-                style={{
-                  padding: '16px 8px',
-                  textAlign: 'center',
-                  opacity: owned ? 1 : 0.5,
-                  filter: owned ? 'none' : 'grayscale(1)',
-                }}
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7 }}
               >
-                <div style={{ fontSize: 30 }}>{owned ? b.emoji : '🔒'}</div>
-                <div style={{ fontSize: 11.5, fontWeight: 700, marginTop: 6, lineHeight: 1.3 }}>{b.name}</div>
+                <BadgeEmblem badgeId={b.id} emoji={b.emoji} owned={owned} />
+                <div
+                  style={{
+                    fontSize: 11.5,
+                    fontWeight: 700,
+                    lineHeight: 1.25,
+                    textAlign: 'center',
+                    color: owned ? 'var(--ink)' : 'var(--ink-3)',
+                  }}
+                >
+                  {b.name}
+                </div>
               </button>
             )
           })}
@@ -438,6 +442,94 @@ function MiniStat({ emoji, label, value }: { emoji: string; label: string; value
         {emoji} {label}
       </div>
       <div style={{ fontSize: 15, fontWeight: 800, marginTop: 3 }}>{value}</div>
+    </div>
+  )
+}
+
+// ── 뱃지 = 개성 있는 '아이템' 형태 엠블럼 ──
+type BadgeShape = 'seal' | 'shield' | 'medal' | 'hex' | 'star' | 'gem'
+const BADGE_STYLE: Record<string, { c1: string; c2: string; shape: BadgeShape }> = {
+  b_start: { c1: '#a6d49a', c2: '#5f9e5f', shape: 'seal' },
+  b_word: { c1: '#c9a3d4', c2: '#8f5fa0', shape: 'shield' },
+  b_hand: { c1: '#efb072', c2: '#c8613b', shape: 'medal' },
+  b_step: { c1: '#9cbfe0', c2: '#5f7fb0', shape: 'hex' },
+  b_eye: { c1: '#eccf5f', c2: '#b58b3c', shape: 'star' },
+  b_calm: { c1: '#93d1b6', c2: '#5fa088', shape: 'gem' },
+  b_lens: { c1: '#b8a6e0', c2: '#7f6fa8', shape: 'shield' },
+  b_voice: { c1: '#f0a6ad', c2: '#c86f7a', shape: 'seal' },
+  b_move: { c1: '#a6d49a', c2: '#5f9e73', shape: 'hex' },
+  b_streak7: { c1: '#f5b06a', c2: '#e0733a', shape: 'star' },
+  b_gift1: { c1: '#f0a6c0', c2: '#d5687f', shape: 'gem' },
+  b_gift3: { c1: '#ecce62', c2: '#c99a3f', shape: 'star' },
+}
+
+function BadgeShapePath({ shape }: { shape: BadgeShape }) {
+  switch (shape) {
+    case 'shield':
+      return <path d="M50 6 L88 20 V50 C88 74 70 90 50 96 C30 90 12 74 12 50 V20 Z" />
+    case 'hex':
+      return <path d="M50 5 L88 27 V73 L50 95 L12 73 V27 Z" />
+    case 'medal':
+      return <circle cx="50" cy="50" r="43" />
+    case 'gem':
+      return <path d="M50 6 L92 40 L50 96 L8 40 Z" />
+    case 'star':
+      return (
+        <path d="M50 4 L61 32 L92 33 L67 52 L76 82 L50 64 L24 82 L33 52 L8 33 L39 32 Z" />
+      )
+    case 'seal':
+    default: {
+      // 스캘럽(꽃잎) 인장
+      const pts = Array.from({ length: 12 }, (_, i) => {
+        const a = (i / 12) * Math.PI * 2
+        const r = i % 2 === 0 ? 46 : 38
+        return `${(50 + r * Math.cos(a)).toFixed(1)},${(50 + r * Math.sin(a)).toFixed(1)}`
+      })
+      return <polygon points={pts.join(' ')} />
+    }
+  }
+}
+
+function BadgeEmblem({ badgeId, emoji, owned }: { badgeId: string; emoji: string; owned: boolean }) {
+  const st = BADGE_STYLE[badgeId] ?? { c1: '#cbb9a0', c2: '#8f7a5f', shape: 'medal' as BadgeShape }
+  const gid = `bg-${badgeId}`
+  return (
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+        aspectRatio: '1',
+        filter: owned ? 'drop-shadow(0 4px 8px rgba(60,45,30,.18))' : 'grayscale(1)',
+        opacity: owned ? 1 : 0.55,
+      }}
+    >
+      <svg viewBox="0 0 100 100" width="100%" height="100%" style={{ display: 'block' }}>
+        <defs>
+          <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor={st.c1} />
+            <stop offset="1" stopColor={st.c2} />
+          </linearGradient>
+        </defs>
+        <g fill={`url(#${gid})`} stroke="rgba(255,255,255,.75)" strokeWidth="2.5" strokeLinejoin="round">
+          <BadgeShapePath shape={st.shape} />
+        </g>
+        {/* 안쪽 밝은 원반 */}
+        <circle cx="50" cy="50" r="26" fill="rgba(255,255,255,.72)" />
+        {/* 윤기 */}
+        <ellipse cx="40" cy="34" rx="16" ry="9" fill="rgba(255,255,255,.35)" />
+      </svg>
+      <span
+        style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'grid',
+          placeItems: 'center',
+          fontSize: 27,
+          lineHeight: 1,
+        }}
+      >
+        {owned ? emoji : '🔒'}
+      </span>
     </div>
   )
 }
